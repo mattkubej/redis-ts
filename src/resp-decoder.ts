@@ -15,18 +15,16 @@ type DecodeResult = {
   readIndex: number;
 };
 
+// TODO: improve error handling
 export function decode(value: Buffer): (string|number)[] {
-  let result = [];
-  let readIndex = 0;
+  const { value: result, readIndex} = parse(value);
 
-  for (;;) {
-    const token = parse(value, readIndex);
-    result.push(token.value);
-    readIndex = token.readIndex;
+  if (readIndex !== value.length) {
+    throw new Error('Read values does not match buffer length.');
+  }
 
-    if (readIndex === value.length) {
-      break;
-    }
+  if (typeof result === 'string') {
+    return [result];
   }
 
   return result;
@@ -47,6 +45,7 @@ function parse(value: Buffer, readIndex: number = 0): DecodeResult {
   }
 };
 
+// TODO: clean up implementation
 function decodeSimpleString(value: Buffer, readIndex: number): DecodeResult {
   const simpleStringTerm = value.indexOf(CRLF, readIndex); 
   const simpleString = value.toString('utf8', readIndex, simpleStringTerm);
@@ -57,6 +56,7 @@ function decodeSimpleString(value: Buffer, readIndex: number): DecodeResult {
   };
 };
 
+// TODO: clean up implementation
 function decodeBulkString(value: Buffer, readIndex: number): DecodeResult {
   const bytesTerm = value.indexOf(CRLF, readIndex); 
   const bytes = parseInt(value.toString('utf8', readIndex, bytesTerm), 10);
@@ -74,6 +74,7 @@ function decodeBulkString(value: Buffer, readIndex: number): DecodeResult {
   };
 };
 
+// TODO: clean up implementation
 function decodeArray(value: Buffer, readIndex: number): DecodeResult {
   const countTerm = value.indexOf(CRLF, readIndex);
   const count = Number(value.toString('utf8', readIndex, countTerm));
