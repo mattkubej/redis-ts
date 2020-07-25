@@ -10,7 +10,7 @@ enum RESPType {
   Array = '*',
 };
 
-type DecodeResult = {
+type Token = {
   value: string | (string|number)[];
   readIndex: number;
 };
@@ -30,7 +30,7 @@ export function decode(value: Buffer): (string|number)[] {
   return result;
 };
 
-function parse(value: Buffer, readIndex: number = 0): DecodeResult {
+function parse(value: Buffer, readIndex: number = 0): Token {
   const type = value.toString('utf8', readIndex, ++readIndex);
 
   switch(type) {
@@ -46,7 +46,7 @@ function parse(value: Buffer, readIndex: number = 0): DecodeResult {
 };
 
 // TODO: clean up implementation
-function decodeSimpleString(value: Buffer, readIndex: number): DecodeResult {
+function decodeSimpleString(value: Buffer, readIndex: number): Token {
   const simpleStringTerm = value.indexOf(CRLF, readIndex); 
   const simpleString = value.toString('utf8', readIndex, simpleStringTerm);
 
@@ -57,7 +57,7 @@ function decodeSimpleString(value: Buffer, readIndex: number): DecodeResult {
 };
 
 // TODO: clean up implementation
-function decodeBulkString(value: Buffer, readIndex: number): DecodeResult {
+function decodeBulkString(value: Buffer, readIndex: number): Token {
   const bytesTerm = value.indexOf(CRLF, readIndex); 
   const bytes = parseInt(value.toString('utf8', readIndex, bytesTerm), 10);
   readIndex = bytesTerm + CRLF.length;
@@ -75,7 +75,7 @@ function decodeBulkString(value: Buffer, readIndex: number): DecodeResult {
 };
 
 // TODO: clean up implementation
-function decodeArray(value: Buffer, readIndex: number): DecodeResult {
+function decodeArray(value: Buffer, readIndex: number): Token {
   const countTerm = value.indexOf(CRLF, readIndex);
   const count = Number(value.toString('utf8', readIndex, countTerm));
   readIndex = countTerm + CRLF.length;
