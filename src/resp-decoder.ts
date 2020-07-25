@@ -1,5 +1,5 @@
-const CR = '\\r';
-const LF = '\\n';
+const CR = '\r';
+const LF = '\n';
 const CRLF = `${CR}${LF}`;
 
 enum RESPType {
@@ -10,57 +10,83 @@ enum RESPType {
   Array = '*',
 };
 
-export function decode(value: Buffer): string {
-  const input = value.toString('utf8').trim();
-  console.log(input);
-  if (!input.endsWith(CRLF)) throw new Error('Incomplete command'); 
+type DecodeResult = {
+  value: string | (string|number)[];
+  readIndex: number;
+};
 
-  const first = input[0];
-  const bytes = input.substring(1);
+export function decode(value: Buffer): (string|number)[] {
+  let result = [];
+  let readIndex = 0;
 
-  switch(first) {
+  for (;;) {
+    const token = parse(value, readIndex);
+    result.push(token.value);
+    readIndex = token.readIndex;
+
+    if (readIndex === value.length) {
+      break;
+    }
+  }
+
+  return result;
+};
+
+function parse(value: Buffer, readIndex: number = 0): DecodeResult {
+  const type = value.toString('utf8', readIndex, ++readIndex);
+
+  switch(type) {
     case RESPType.SimpleString:
-      return decodeSimpleString(bytes);
+      return decodeSimpleString(value, readIndex);
     case RESPType.BulkString:
-      return decodeBulkString(bytes);
+      return decodeBulkString(value, readIndex);
     case RESPType.Array:
-      return decodeArray(bytes);
+      return decodeArray(value, readIndex);
     default:
-      throw new Error(`Unhandled first char: ${first}`);
+      throw new Error(`Unrecognized type: ${type}`);
   }
 };
 
-function decodeSimpleString(input: string): string {
-  const simpleString = input.slice(0, -4); //TODO: test this
+function decodeSimpleString(value: Buffer, readIndex: number): DecodeResult {
+  const simpleStringTerm = value.indexOf(CRLF, readIndex); 
+  const simpleString = value.toString('utf8', readIndex, simpleStringTerm);
 
-  if (simpleString.includes(CR)) 
-    throw new Error('Simple Strings cannot contain a CR');
-
-  if (simpleString.includes(LF)) 
-    throw new Error('Simple Strings cannot contain a LF');
-
-  return simpleString;
+  return {
+    value: simpleString,
+    readIndex: simpleStringTerm + CRLF.length
+  };
 };
 
-function decodeBulkString(input: string): string {
-  const bytes = Number(input[0]); //TODO: only handles single digit
-  if (input.substr(1, 4) !== CRLF)
-    throw new Error('Bulk String bytes must be terminated with CRLF');
+function decodeBulkString(value: Buffer, readIndex: number): DecodeResult {
+  const bytesTerm = value.indexOf(CRLF, readIndex); 
+  const bytes = parseInt(value.toString('utf8', readIndex, bytesTerm), 10);
+  readIndex = bytesTerm + CRLF.length;
 
-  const bulkString = input.substr(5, bytes); //TODO: need to accommodate length of bytes
-  if (bulkString.length !== bytes)
-    throw new Error('Bulk String bytes does not match string length');
-
-  return bulkString;
-};
-
-function decodeArray(input: string): string {
-  let bytes = Number(input[0]); //TODO: only handles single digit
-
-  while (bytes > 0) {
-    const d = decode(Buffer.from(input.substr(5)));
-    bytes--;
+  if (bytes === -1) {
+    return null;
   }
 
-  return input;
+  const bulkString = value.toString('utf8', readIndex, readIndex + bytes);
+
+  return {
+    value: bulkString,
+    readIndex: readIndex + bytes + CRLF.length 
+  };
+};
+
+function decodeArray(value: Buffer, readIndex: number): DecodeResult {
+  const countTerm = value.indexOf(CRLF, readIndex);
+  const count = Number(value.toString('utf8', readIndex, countTerm));
+  readIndex = countTerm + CRLF.length;
+
+  const elements = [];
+  for (let i = 0; i < count; i++) {
+    const token = parse(value, readIndex);
+    elements.push(token.value);
+  }
+
+  return {
+    value: elements,
+    readIndex: readIndex
+  };
 }
