@@ -30,6 +30,7 @@ export function decode(value: Buffer): (string|number)[] {
   return result;
 };
 
+// TODO: account for inline commands, support telnet
 function parse(value: Buffer, readIndex: number = 0): Token {
   const type = value.toString('utf8', readIndex, ++readIndex);
 
