@@ -11,7 +11,7 @@ enum RESPType {
 };
 
 type Token = {
-  value: string | (string|number)[];
+  value: number | string | (string|number)[];
   readIndex: number;
 };
 
@@ -23,11 +23,11 @@ export function decode(value: Buffer): (string|number)[] {
     throw new Error('Read values does not match buffer length.');
   }
 
-  if (typeof result === 'string') {
-    return [result];
+  if (result instanceof Array) {
+    return result;
   }
 
-  return result;
+  return [result];
 };
 
 // TODO: account for inline commands, support telnet
@@ -41,6 +41,12 @@ function parse(value: Buffer, readIndex: number = 0): Token {
       return decodeBulkString(value, readIndex);
     case RESPType.Array:
       return decodeArray(value, readIndex);
+    case RESPType.Integer:
+      // TODO: introduce implementation
+      return { value: 0, readIndex };
+    case RESPType.Error:
+      // TODO: introduce implementation
+      return { value: -1, readIndex };
     default:
       throw new Error(`Unrecognized type: ${type}`);
   }
