@@ -82,6 +82,7 @@ function decodeArray(value: Buffer, readIndex: number): DecodeResult {
   const elements = [];
   for (let i = 0; i < count; i++) {
     const token = parse(value, readIndex);
+    readIndex = token.readIndex;
     elements.push(token.value);
   }
 
