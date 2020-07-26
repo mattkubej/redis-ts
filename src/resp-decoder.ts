@@ -44,8 +44,7 @@ function parse(value: Buffer, readIndex: number = 0): Token {
     case RESPType.Integer:
       return decodeInteger(value, readIndex);
     case RESPType.Error:
-      // TODO: introduce implementation
-      return { value: -1, readIndex };
+      decodeError(value, readIndex);
     default:
       throw new Error(`Unrecognized type: ${type}`);
   }
@@ -109,3 +108,9 @@ function decodeInteger(value: Buffer, readIndex: number): Token {
   };
 };
 
+function decodeError(value: Buffer, readIndex: number): Token {
+  const errorTerm = value.indexOf(CRLF, readIndex); 
+  const error = value.toString('utf8', readIndex, errorTerm);
+
+  throw new Error(error);
+};
