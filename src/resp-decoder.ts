@@ -101,7 +101,7 @@ function decodeArray(value: Buffer, readIndex: number): Token {
 
 function decodeInteger(value: Buffer, readIndex: number): Token {
   const integerTerm = value.indexOf(CRLF, readIndex); 
-  const integer = value.toString('utf8', readIndex, integerTerm);
+  const integer = parseInt(value.toString('utf8', readIndex, integerTerm), 10);
 
   return {
     value: integer,
