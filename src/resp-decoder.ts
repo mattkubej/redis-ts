@@ -42,8 +42,7 @@ function parse(value: Buffer, readIndex: number = 0): Token {
     case RESPType.Array:
       return decodeArray(value, readIndex);
     case RESPType.Integer:
-      // TODO: introduce implementation
-      return { value: 0, readIndex };
+      return decodeInteger(value, readIndex);
     case RESPType.Error:
       // TODO: introduce implementation
       return { value: -1, readIndex };
@@ -98,4 +97,15 @@ function decodeArray(value: Buffer, readIndex: number): Token {
     value: elements,
     readIndex: readIndex
   };
-}
+};
+
+function decodeInteger(value: Buffer, readIndex: number): Token {
+  const integerTerm = value.indexOf(CRLF, readIndex); 
+  const integer = value.toString('utf8', readIndex, integerTerm);
+
+  return {
+    value: integer,
+    readIndex: integerTerm + CRLF.length
+  };
+};
+
