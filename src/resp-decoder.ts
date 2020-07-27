@@ -27,6 +27,7 @@ export function decode(value: Buffer): (string|number)[] {
     return result;
   }
 
+  // TODO: might be incorrect, should not force an array
   return [result];
 };
 

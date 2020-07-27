@@ -7,10 +7,8 @@ const server = createServer();
 server.on('connection', function(socket) {
   socket.on('data', function(data) {
     try {
-      console.log('-[receive]-> ', data.toString('utf8'));
-      const cmd = decode(data);
-      console.log('-[cmd]-> ', cmd);
-      //handle(socket, cmd);
+      const request = decode(data);
+      handle(socket, request);
     } catch (e) {
       console.error(e);
     }
