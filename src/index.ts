@@ -7,6 +7,9 @@ const server = createServer();
 server.on('connection', function(socket) {
   socket.on('data', function(data) {
     try {
+      // TODO: consider changing this
+      //       - invoke decode within handle
+      //       - rename command handler to request handler
       const request = decode(data);
       handle(socket, request);
     } catch (e) {
