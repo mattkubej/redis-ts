@@ -13,6 +13,9 @@ export default class RedisServer {
   private registerCommands() {
     this.commands.set('echo', new cmd.Echo());
     this.commands.set('ping', new cmd.Ping());
+
+    // cloning map to avoid circular dependency
+    this.commands.set('command', new cmd.Command(new Map(this.commands)));
   }
 
   private handleRequest(client: Socket, data: Buffer) {
