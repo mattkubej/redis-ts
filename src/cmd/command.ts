@@ -8,7 +8,47 @@ export default class Command extends RedisCommand {
   }
 
   execute(client: Socket, request: (number|string)[]) {
-    console.log(this.commands);
-    client.write('*6\r\n$3\r\nget\r\n:2\r\n*2\r\n+readonly\r\n+fast\r\n:1\r\n:1\r\n:1\r\n')
+    const allDetails = [this.addCommandReply(this)];
+
+    this.commands.forEach((cmd) => {
+      allDetails.push(this.addCommandReply(cmd));
+    });
+
+    const reply = this.encodeArray(allDetails);
+    client.write(reply);
+  }
+
+  addCommandReply(cmd: cmd.RedisCommand): string {
+    const details = [];
+
+    details.push(this.encodeBulkString(cmd.name));
+    details.push(this.encodeInteger(cmd.arity));
+
+    const flags = cmd.flags.map(this.encodeSimpleString);
+    details.push(this.encodeArray(flags));
+
+    details.push(this.encodeInteger(cmd.firstKey));
+    details.push(this.encodeInteger(cmd.lastKey));
+    details.push(this.encodeInteger(cmd.keyStep));
+
+    return this.encodeArray(details);
+  }
+
+  encodeSimpleString(value: string): string {
+    return `+${value}\r\n`;
+  }
+
+  encodeBulkString(value: string): string {
+    return `$${value.length}\r\n${value}\r\n`;
+  }
+
+  encodeInteger(value: number): string {
+    return `:${value}\r\n`;
+  }
+
+  encodeArray(values: string[]): string {
+    return values.reduce(function(acc, cur) {
+      return acc += cur;
+    }, `*${values.length}\r\n`);
   }
 }
