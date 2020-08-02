@@ -1,5 +1,6 @@
 import RedisCommand from './redis-command';
 import { Socket } from 'net';
+import { encodeBulkString } from '../resp/encoder';
 
 export default class Echo extends RedisCommand {
   constructor() {
@@ -8,7 +9,7 @@ export default class Echo extends RedisCommand {
 
   execute(client: Socket, request: (number|string)[]) {
     const message = String(request[1]);
-    const length = message.length;
-    client.write(`$${length}\r\n${message}\r\n`);
+    const reply = encodeBulkString(message);
+    client.write(reply);
   }
 }
