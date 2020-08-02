@@ -1,5 +1,6 @@
 import RedisCommand from './redis-command';
 import { Socket } from 'net';
+import { encodeSimpleString } from '../resp/encoder';
 
 export default class Ping extends RedisCommand {
   constructor() {
@@ -11,6 +12,7 @@ export default class Ping extends RedisCommand {
       console.log(`wrong number of arguments for '${this.name}' command`)
     }
 
-    client.write('+PONG\r\n');
+    const reply = encodeSimpleString('PONG');
+    client.write(reply);
   }
 }
