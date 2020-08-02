@@ -9,3 +9,5 @@ export enum RESPType {
   BulkString = '$',
   Array = '*',
 };
+
+export const OK = `+OK${CRLF}`;
