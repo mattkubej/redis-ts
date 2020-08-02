@@ -1,6 +1,7 @@
 import RedisCommand from './redis-command';
 import { Socket } from 'net';
 import * as cmd from './index';
+import { encodeArray, encodeBulkString, encodeInteger, encodeSimpleString } from '../resp/encoder';
 
 export default class Command extends RedisCommand {
   constructor(public commands: Map<string, cmd.RedisCommand>) {
@@ -14,41 +15,23 @@ export default class Command extends RedisCommand {
       allDetails.push(this.addCommandReply(cmd));
     });
 
-    const reply = this.encodeArray(allDetails);
+    const reply = encodeArray(allDetails);
     client.write(reply);
   }
 
   addCommandReply(cmd: cmd.RedisCommand): string {
     const details = [];
 
-    details.push(this.encodeBulkString(cmd.name));
-    details.push(this.encodeInteger(cmd.arity));
+    details.push(encodeBulkString(cmd.name));
+    details.push(encodeInteger(cmd.arity));
 
-    const flags = cmd.flags.map(this.encodeSimpleString);
-    details.push(this.encodeArray(flags));
+    const flags = cmd.flags.map(encodeSimpleString);
+    details.push(encodeArray(flags));
 
-    details.push(this.encodeInteger(cmd.firstKey));
-    details.push(this.encodeInteger(cmd.lastKey));
-    details.push(this.encodeInteger(cmd.keyStep));
+    details.push(encodeInteger(cmd.firstKey));
+    details.push(encodeInteger(cmd.lastKey));
+    details.push(encodeInteger(cmd.keyStep));
 
-    return this.encodeArray(details);
-  }
-
-  encodeSimpleString(value: string): string {
-    return `+${value}\r\n`;
-  }
-
-  encodeBulkString(value: string): string {
-    return `$${value.length}\r\n${value}\r\n`;
-  }
-
-  encodeInteger(value: number): string {
-    return `:${value}\r\n`;
-  }
-
-  encodeArray(values: string[]): string {
-    return values.reduce(function(acc, cur) {
-      return acc += cur;
-    }, `*${values.length}\r\n`);
+    return encodeArray(details);
   }
 }

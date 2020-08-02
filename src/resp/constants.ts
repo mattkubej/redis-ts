@@ -1,8 +1,8 @@
-const CR = '\r';
-const LF = '\n';
-const CRLF = `${CR}${LF}`;
+export const CR = '\r';
+export const LF = '\n';
+export const CRLF = `${CR}${LF}`;
 
-enum RESPType {
+export enum RESPType {
   SimpleString = '+',
   Error = '-',
   Integer = ':',

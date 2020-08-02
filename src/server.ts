@@ -1,5 +1,5 @@
 import { createServer, Server, Socket } from 'net';
-import { decode } from './resp';
+import { decode } from './resp/decoder';
 import * as cmd from './cmd';
 
 export default class RedisServer {
