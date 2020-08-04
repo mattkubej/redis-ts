@@ -7,7 +7,7 @@ type Token = {
 
 // TODO: improve error handling
 export function decode(value: Buffer): (string|number)[] {
-  const { value: result, readIndex} = parse(value);
+  const { value: result, readIndex } = parse(value);
 
   if (readIndex !== value.length) {
     throw new Error('Read values does not match buffer length.');
