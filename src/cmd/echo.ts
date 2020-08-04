@@ -7,7 +7,7 @@ export default class Echo extends RedisCommand {
     super('echo', 2, ['fast'], 0, 0, 0);
   }
 
-  execute(client: Socket, request: (number|string)[]) {
+  execute(client: Socket, request: (number|string)[]): void {
     const message = String(request[1]);
     const reply = encodeBulkString(message);
     client.write(reply);

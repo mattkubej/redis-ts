@@ -19,10 +19,10 @@ export function decode(value: Buffer): (string|number)[] {
 
   // TODO: might be incorrect, should not force an array
   return [result];
-};
+}
 
 // TODO: account for inline commands, support telnet
-function parse(value: Buffer, readIndex: number = 0): Token {
+function parse(value: Buffer, readIndex = 0): Token {
   const type = value.toString('utf8', readIndex, ++readIndex);
 
   switch(type) {
@@ -36,10 +36,11 @@ function parse(value: Buffer, readIndex: number = 0): Token {
       return decodeInteger(value, readIndex);
     case RESPType.Error:
       decodeError(value, readIndex);
+      break;
     default:
       throw new Error(`Unrecognized type: ${type}`);
   }
-};
+}
 
 // TODO: clean up implementation
 function decodeSimpleString(value: Buffer, readIndex: number): Token {
@@ -50,7 +51,7 @@ function decodeSimpleString(value: Buffer, readIndex: number): Token {
     value: simpleString,
     readIndex: simpleStringTerm + CRLF.length
   };
-};
+}
 
 // TODO: clean up implementation
 function decodeBulkString(value: Buffer, readIndex: number): Token {
@@ -68,7 +69,7 @@ function decodeBulkString(value: Buffer, readIndex: number): Token {
     value: bulkString,
     readIndex: readIndex + bytes + CRLF.length 
   };
-};
+}
 
 // TODO: clean up implementation
 function decodeArray(value: Buffer, readIndex: number): Token {
@@ -87,7 +88,7 @@ function decodeArray(value: Buffer, readIndex: number): Token {
     value: elements,
     readIndex: readIndex
   };
-};
+}
 
 function decodeInteger(value: Buffer, readIndex: number): Token {
   const integerTerm = value.indexOf(CRLF, readIndex); 
@@ -97,11 +98,11 @@ function decodeInteger(value: Buffer, readIndex: number): Token {
     value: integer,
     readIndex: integerTerm + CRLF.length
   };
-};
+}
 
 function decodeError(value: Buffer, readIndex: number): Token {
   const errorTerm = value.indexOf(CRLF, readIndex); 
   const error = value.toString('utf8', readIndex, errorTerm);
 
   throw new Error(error);
-};
+}

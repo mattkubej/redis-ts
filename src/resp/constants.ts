@@ -8,6 +8,6 @@ export enum RESPType {
   Integer = ':',
   BulkString = '$',
   Array = '*',
-};
+}
 
 export const OK = `+OK${CRLF}`;

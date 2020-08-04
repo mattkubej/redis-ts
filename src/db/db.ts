@@ -1,6 +1,6 @@
 const database = new Map();
 
-export function set(key: string, value: string) {
+export function set(key: string, value: string): void {
   database.set(key, value);
 }
 

@@ -7,4 +7,4 @@ export default abstract class RedisCommand {
   }
 
   abstract execute(client: Socket, request: (number|string)[]): void;
-};
+}

@@ -27,6 +27,7 @@ export default class RedisServer {
     command.execute(client, request);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   listen(...args: any[]): Server {
     const server = createServer();
 
@@ -42,5 +43,5 @@ export default class RedisServer {
     });
 
     return server.listen(...args);
-  };
-};
+  }
+}
