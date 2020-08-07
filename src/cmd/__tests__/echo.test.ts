@@ -13,7 +13,7 @@ describe('echo command', () => {
     expect(command.name).toBe('echo');
   });
 
-  it('should have an arity of ', () => {
+  it('should have an arity of 2', () => {
     const command = new Echo();
     expect(command.arity).toBe(2);
   });
