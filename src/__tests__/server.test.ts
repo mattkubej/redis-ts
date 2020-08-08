@@ -1,6 +1,6 @@
 import RedisServer from '../server';
 import { createConnection, Server, Socket } from 'net';
-import Echo from '../cmd/echo';
+import * as cmd from '../cmd';
 
 jest.mock('../cmd/echo');
 
@@ -39,7 +39,7 @@ describe('server', () => {
     client.write(Buffer.from('*1\r\n$4\r\nECHO\r\n'));
     await request;
 
-    const mockExecute = (Echo as jest.Mock).mock.instances[0].execute.mock;
+    const mockExecute = (cmd.Echo as jest.Mock).mock.instances[0].execute.mock;
     const executeClient = mockExecute.calls[0][0];
     const executeRequest = mockExecute.calls[0][1];
 
