@@ -25,7 +25,7 @@ export default class Command extends RedisCommand {
     client.write(reply);
   }
 
-  addCommandReply(cmd: cmd.RedisCommand): string {
+  private addCommandReply(cmd: cmd.RedisCommand): string {
     const details = [];
 
     details.push(encodeBulkString(cmd.name));
