@@ -3,8 +3,8 @@ import { Socket } from 'net';
 
 jest.mock('net', () => ({
   Socket: () => ({
-    write: jest.fn()
-  })
+    write: jest.fn(),
+  }),
 }));
 
 describe('ping command', () => {
@@ -47,7 +47,7 @@ describe('ping command', () => {
 
     it('should write PONG as a simple string back to the client', () => {
       const command = new Ping();
-      const client = new Socket(); 
+      const client = new Socket();
 
       command.execute(client, ['ping']);
       expect(client.write).toBeCalledWith('+PONG\r\n');

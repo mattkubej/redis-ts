@@ -7,9 +7,9 @@ export default class Ping extends RedisCommand {
     super('ping', -1, ['stale', 'fast'], 0, 0, 0);
   }
 
-  execute(client: Socket, request: (number|string)[]): void {
+  execute(client: Socket, request: (number | string)[]): void {
     if (request.length > 2) {
-      console.log(`wrong number of arguments for '${this.name}' command`)
+      console.log(`wrong number of arguments for '${this.name}' command`);
     }
 
     const reply = encodeSimpleString('PONG');

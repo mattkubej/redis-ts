@@ -3,8 +3,8 @@ import { Socket } from 'net';
 
 jest.mock('net', () => ({
   Socket: () => ({
-    write: jest.fn()
-  })
+    write: jest.fn(),
+  }),
 }));
 
 describe('echo command', () => {
@@ -46,7 +46,7 @@ describe('echo command', () => {
 
     it('should write the first argument (string) back to the client as a bulk string', () => {
       const command = new Echo();
-      const client = new Socket(); 
+      const client = new Socket();
 
       command.execute(client, ['echo', 'hello world']);
       expect(client.write).toBeCalledWith('$11\r\nhello world\r\n');
@@ -54,7 +54,7 @@ describe('echo command', () => {
 
     it('should write the first argument (number) back to the client as a bulk string', () => {
       const command = new Echo();
-      const client = new Socket(); 
+      const client = new Socket();
 
       command.execute(client, ['echo', 24]);
       expect(client.write).toBeCalledWith('$2\r\n24\r\n');

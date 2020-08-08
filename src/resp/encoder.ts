@@ -11,7 +11,7 @@ export function encodeInteger(value: number): string {
 }
 
 export function encodeArray(values: string[]): string {
-  return values.reduce(function(acc, cur) {
-    return acc += cur;
+  return values.reduce(function (acc, cur) {
+    return (acc += cur);
   }, `*${values.length}\r\n`);
 }

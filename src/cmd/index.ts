@@ -5,11 +5,4 @@ import Ping from './ping';
 import RedisCommand from './redis-command';
 import Set from './set';
 
-export {
-  Command,
-  Echo,
-  Get,
-  Ping,
-  RedisCommand,
-  Set
-};
+export { Command, Echo, Get, Ping, RedisCommand, Set };

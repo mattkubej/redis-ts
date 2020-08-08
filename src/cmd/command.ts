@@ -1,7 +1,12 @@
 import RedisCommand from './redis-command';
 import { Socket } from 'net';
 import * as cmd from './index';
-import { encodeArray, encodeBulkString, encodeInteger, encodeSimpleString } from '../resp/encoder';
+import {
+  encodeArray,
+  encodeBulkString,
+  encodeInteger,
+  encodeSimpleString,
+} from '../resp/encoder';
 
 export default class Command extends RedisCommand {
   constructor(public commands: Map<string, cmd.RedisCommand>) {
@@ -9,7 +14,7 @@ export default class Command extends RedisCommand {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  execute(client: Socket, request: (number|string)[]): void {
+  execute(client: Socket, request: (number | string)[]): void {
     const allDetails = [this.addCommandReply(this)];
 
     this.commands.forEach((cmd) => {

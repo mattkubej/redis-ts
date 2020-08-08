@@ -4,15 +4,15 @@ import { get } from '../../db';
 
 jest.mock('net', () => ({
   Socket: () => ({
-    write: jest.fn()
-  })
+    write: jest.fn(),
+  }),
 }));
 
 jest.mock('../../db', () => ({
   get: jest.fn().mockImplementation((key: string): string | null => {
     if (key === 'mykey') return 'myvalue';
     return null;
-  })
+  }),
 }));
 
 describe('get command', () => {
@@ -55,7 +55,7 @@ describe('get command', () => {
 
     it('it should write the value of the key to the client as a bulk string if present', () => {
       const command = new Get();
-      const client = new Socket(); 
+      const client = new Socket();
 
       command.execute(client, ['get', 'mykey']);
 

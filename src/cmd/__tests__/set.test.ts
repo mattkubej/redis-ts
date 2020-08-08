@@ -4,12 +4,12 @@ import { set } from '../../db';
 
 jest.mock('net', () => ({
   Socket: () => ({
-    write: jest.fn()
-  })
+    write: jest.fn(),
+  }),
 }));
 
 jest.mock('../../db', () => ({
-  set: jest.fn()
+  set: jest.fn(),
 }));
 
 describe('set command', () => {
@@ -52,7 +52,7 @@ describe('set command', () => {
 
     it('it should save the key and value to the db and respond with OK to the client', () => {
       const command = new SetCommand();
-      const client = new Socket(); 
+      const client = new Socket();
 
       command.execute(client, ['set', 'mykey', 'myvalue']);
 
