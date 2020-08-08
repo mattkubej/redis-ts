@@ -1,5 +1,6 @@
 import Get from '../get';
 import { Socket } from 'net';
+import { get } from '../../db';
 
 jest.mock('net', () => ({
   Socket: () => ({
@@ -8,10 +9,10 @@ jest.mock('net', () => ({
 }));
 
 jest.mock('../../db', () => ({
-  get: (key: string): string | null => {
+  get: jest.fn().mockImplementation((key: string): string | null => {
     if (key === 'mykey') return 'myvalue';
     return null;
-  }
+  })
 }));
 
 describe('get command', () => {
@@ -57,6 +58,8 @@ describe('get command', () => {
       const client = new Socket(); 
 
       command.execute(client, ['get', 'mykey']);
+
+      expect(get).toHaveBeenCalledWith('mykey');
       expect(client.write).toBeCalledWith('$7\r\nmyvalue\r\n');
     });
   });
