@@ -20,6 +20,20 @@ export default class RedisServer {
     this.commands.set('command', new cmd.Command(new Map(this.commands)));
   }
 
+  private handleClientConnection(client: Socket): void {
+    client.on('data', (data: Buffer) => {
+      this.handleClientData(client, data);
+    });
+  }
+
+  private handleClientData(client: Socket, data: Buffer): void {
+    try {
+      this.handleRequest(client, data);
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
   private handleRequest(client: Socket, data: Buffer) {
     const request = decode(data);
     const commandName = String(request[0]).toLowerCase();
@@ -31,16 +45,7 @@ export default class RedisServer {
   listen(...args: any[]): Server {
     const server = createServer();
 
-    // TODO: clean this up
-    server.on('connection', (socket) => {
-      socket.on('data', (data) => {
-        try {
-          this.handleRequest(socket, data);
-        } catch (e) {
-          console.error(e);
-        }
-      });
-    });
+    server.on('connection', this.handleClientConnection.bind(this));
 
     return server.listen(...args);
   }
