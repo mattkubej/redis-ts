@@ -4,6 +4,7 @@ import * as cmd from '../cmd';
 
 jest.mock('../cmd/echo');
 jest.mock('../cmd/get');
+jest.mock('../cmd/ping');
 jest.mock('../cmd/set');
 
 describe('server', () => {
@@ -59,6 +60,19 @@ describe('server', () => {
     expect(executeClient instanceof Socket).toBeTruthy();
     expect(executeClient.server).toBe(server);
     expect(executeRequest).toStrictEqual(['GET', 'test']);
+  });
+
+  it('should invoke the ping command with a ping request', async () => {
+    client.write(Buffer.from('*2\r\n$4\r\nPING\r\n$4\r\ntest\r\n'));
+    await request;
+
+    const mockExecute = (cmd.Ping as jest.Mock).mock.instances[0].execute.mock;
+    const executeClient = mockExecute.calls[0][0];
+    const executeRequest = mockExecute.calls[0][1];
+
+    expect(executeClient instanceof Socket).toBeTruthy();
+    expect(executeClient.server).toBe(server);
+    expect(executeRequest).toStrictEqual(['PING', 'test']);
   });
 
   it('should invoke the set command with a set request', async () => {
