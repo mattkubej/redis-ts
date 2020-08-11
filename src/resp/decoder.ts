@@ -42,18 +42,17 @@ function parse(value: Buffer, readIndex = 0): Token {
   }
 }
 
-// TODO: clean up implementation
 function decodeSimpleString(value: Buffer, readIndex: number): Token {
   const simpleStringTerm = value.indexOf(CRLF, readIndex);
   const simpleString = value.toString('utf8', readIndex, simpleStringTerm);
+  readIndex = simpleStringTerm + CRLF.length;
 
   return {
     value: simpleString,
-    readIndex: simpleStringTerm + CRLF.length,
+    readIndex,
   };
 }
 
-// TODO: clean up implementation
 function decodeBulkString(value: Buffer, readIndex: number): Token {
   const bytesTerm = value.indexOf(CRLF, readIndex);
   const bytes = parseInt(value.toString('utf8', readIndex, bytesTerm), 10);
@@ -64,14 +63,14 @@ function decodeBulkString(value: Buffer, readIndex: number): Token {
   }
 
   const bulkString = value.toString('utf8', readIndex, readIndex + bytes);
+  readIndex = readIndex + bytes + CRLF.length;
 
   return {
     value: bulkString,
-    readIndex: readIndex + bytes + CRLF.length,
+    readIndex,
   };
 }
 
-// TODO: clean up implementation
 function decodeArray(value: Buffer, readIndex: number): Token {
   const countTerm = value.indexOf(CRLF, readIndex);
   const count = Number(value.toString('utf8', readIndex, countTerm));
@@ -86,17 +85,18 @@ function decodeArray(value: Buffer, readIndex: number): Token {
 
   return {
     value: elements,
-    readIndex: readIndex,
+    readIndex,
   };
 }
 
 function decodeInteger(value: Buffer, readIndex: number): Token {
   const integerTerm = value.indexOf(CRLF, readIndex);
   const integer = parseInt(value.toString('utf8', readIndex, integerTerm), 10);
+  readIndex = integerTerm + CRLF.length;
 
   return {
     value: integer,
-    readIndex: integerTerm + CRLF.length,
+    readIndex,
   };
 }
 
