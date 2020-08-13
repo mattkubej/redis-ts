@@ -12,6 +12,7 @@ describe('server', () => {
   let server: Server;
   let client: Socket;
   let request: Promise<Buffer>;
+  const writeMock: jest.Mock = jest.fn();
 
   beforeEach(async () => {
     redisServer = new RedisServer();
@@ -19,6 +20,7 @@ describe('server', () => {
 
     request = new Promise((resolve) => {
       server.on('connection', (socket) => {
+        socket.write = writeMock;
         socket.on('data', resolve);
       });
     });
@@ -86,5 +88,12 @@ describe('server', () => {
     expect(executeClient instanceof Socket).toBeTruthy();
     expect(executeClient.server).toBe(server);
     expect(executeRequest).toStrictEqual(['SET', 'test']);
+  });
+
+  it('should reply with an error when receiving an unknown command', async () => {
+    client.write(Buffer.from('*1\r\n$4\r\nFAKE\r\n'));
+    await request;
+
+    expect(writeMock).toBeCalledWith("-ERR unknown command 'FAKE'\r\n");
   });
 });

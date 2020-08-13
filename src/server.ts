@@ -1,5 +1,6 @@
 import { createServer, Server, Socket } from 'net';
 import { decode } from './resp/decoder';
+import { encodeError } from './resp/encoder';
 import * as cmd from './cmd';
 
 export default class RedisServer {
@@ -36,9 +37,15 @@ export default class RedisServer {
 
   private handleRequest(client: Socket, data: Buffer) {
     const request = decode(data);
-    const commandName = String(request[0]).toLowerCase();
-    const command = this.commands.get(commandName);
-    command.execute(client, request);
+    const commandName = String(request[0]);
+    const command = this.commands.get(commandName.toLowerCase());
+
+    if (command) {
+      command.execute(client, request);
+    } else {
+      const reply = encodeError(`unknown command '${commandName}'`);
+      client.write(reply);
+    }
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
