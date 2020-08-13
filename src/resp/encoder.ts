@@ -15,3 +15,7 @@ export function encodeArray(values: string[]): string {
     return (acc += cur);
   }, `*${values.length}\r\n`);
 }
+
+export function encodeError(value: string): string {
+  return `-ERR ${value}\r\n`;
+}

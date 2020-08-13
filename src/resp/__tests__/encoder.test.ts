@@ -3,6 +3,7 @@ import {
   encodeBulkString,
   encodeInteger,
   encodeArray,
+  encodeError,
 } from '../encoder';
 
 describe('encoder', () => {
@@ -31,6 +32,13 @@ describe('encoder', () => {
     it('should encode the values to an array', () => {
       const result = encodeArray(['+one\r\n', '+two\r\n']);
       expect(result).toBe('*2\r\n+one\r\n+two\r\n');
+    });
+  });
+
+  describe('encodeError', () => {
+    it('should encode the value to an error', () => {
+      const result = encodeError('something bad');
+      expect(result).toBe('-ERR something bad\r\n');
     });
   });
 });
