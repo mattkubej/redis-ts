@@ -38,6 +38,7 @@ function parse(value: Buffer, readIndex = 0): Token {
       decodeError(value, readIndex);
       break;
     default:
+      // TODO: -ERR Protocol error
       throw new Error(`Unrecognized type: ${type}`);
   }
 }

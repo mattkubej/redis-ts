@@ -1,3 +1,4 @@
+// TODO: utilize constants
 export function encodeSimpleString(value: string): string {
   return `+${value}\r\n`;
 }

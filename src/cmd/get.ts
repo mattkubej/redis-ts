@@ -8,6 +8,7 @@ export default class Get extends RedisCommand {
     super('get', -3, ['write', 'denyoom'], 1, 1, 1);
   }
 
+  // TODO: handle all variations
   execute(client: Socket, request: (number | string)[]): void {
     const key = String(request[1]);
     const value = get(key);

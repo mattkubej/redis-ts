@@ -13,6 +13,7 @@ export default class Command extends RedisCommand {
     super('command', -1, ['loading', 'stale'], 0, 0, 0);
   }
 
+  // TODO: handle all variations
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   execute(client: Socket, request: (number | string)[]): void {
     const allDetails = [this.addCommandReply(this)];
