@@ -110,7 +110,7 @@ describe('server', () => {
     spy.mockRestore();
   });
 
-  it('should reply with a generic error handleRequest fails with an error without a message', async () => {
+  it('should reply with a generic error when handleRequest fails with an error without a message', async () => {
     (cmd.Ping as jest.Mock).mock.instances[0].execute.mockImplementation(() => {
       throw new Error();
     });
@@ -119,5 +119,45 @@ describe('server', () => {
     await request;
 
     expect(writeMock).toBeCalledWith('-ERR unexpected error\r\n');
+  });
+
+  it('should write an error to stderr when client.write fails', async () => {
+    (cmd.Ping as jest.Mock).mock.instances[0].execute.mockImplementation(() => {
+      throw new Error();
+    });
+
+    const spy = jest.spyOn(console, 'error').mockImplementation();
+    const error = new Error('socket failure');
+    writeMock.mockImplementation(() => {
+      throw error;
+    });
+
+    client.write(Buffer.from('*1\r\n$4\r\nPING\r\n'));
+    await request;
+
+    expect(console.error).toBeCalledWith(
+      "failed to handle request 'socket failure'"
+    );
+    spy.mockRestore();
+  });
+
+  it('should write a generic error to stderr when client.write fails without a message', async () => {
+    (cmd.Ping as jest.Mock).mock.instances[0].execute.mockImplementation(() => {
+      throw new Error();
+    });
+
+    const spy = jest.spyOn(console, 'error').mockImplementation();
+    const error = new Error();
+    writeMock.mockImplementation(() => {
+      throw error;
+    });
+
+    client.write(Buffer.from('*1\r\n$4\r\nPING\r\n'));
+    await request;
+
+    expect(console.error).toBeCalledWith(
+      "failed to handle request 'unexpected error'"
+    );
+    spy.mockRestore();
   });
 });

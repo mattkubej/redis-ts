@@ -31,7 +31,8 @@ export default class RedisServer {
     try {
       this.handleRequest(client, data);
     } catch (e) {
-      console.error(e);
+      const message = e.message ? e.message : 'unexpected error';
+      console.error(`failed to handle request '${message}'`);
     }
   }
 
