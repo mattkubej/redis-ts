@@ -36,14 +36,19 @@ export default class RedisServer {
   }
 
   private handleRequest(client: Socket, data: Buffer) {
-    const request = decode(data);
-    const commandName = String(request[0]);
-    const command = this.commands.get(commandName.toLowerCase());
+    try {
+      const request = decode(data);
+      const commandName = String(request[0]);
+      const command = this.commands.get(commandName.toLowerCase());
 
-    if (command) {
+      if (!command) {
+        throw new Error(`unknown command '${commandName}'`);
+      }
+
       command.execute(client, request);
-    } else {
-      const reply = encodeError(`unknown command '${commandName}'`);
+    } catch (e) {
+      const message = e.message ? e.message : 'unexpected error';
+      const reply = encodeError(message);
       client.write(reply);
     }
   }

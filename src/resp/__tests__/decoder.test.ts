@@ -46,6 +46,6 @@ describe('decode', () => {
     expect(() => {
       const data = Buffer.from('&error\r\n');
       decode(data);
-    }).toThrowError("-ERR unknown data type prefix '&'");
+    }).toThrowError("unknown data type prefix '&'");
   });
 });

@@ -1,6 +1,7 @@
 import RedisServer from '../server';
 import { createConnection, Server, Socket } from 'net';
 import * as cmd from '../cmd';
+import * as decoder from '../resp/decoder';
 
 jest.mock('../cmd/echo');
 jest.mock('../cmd/get');
@@ -95,5 +96,28 @@ describe('server', () => {
     await request;
 
     expect(writeMock).toBeCalledWith("-ERR unknown command 'FAKE'\r\n");
+  });
+
+  it('should reply with an error when failing to decode a request', async () => {
+    const spy = jest.spyOn(decoder, 'decode').mockImplementation(() => {
+      throw new Error('failed to decode request');
+    });
+
+    client.write(Buffer.from('*1\r\n$4\r\nFAKE\r\n'));
+    await request;
+
+    expect(writeMock).toBeCalledWith('-ERR failed to decode request\r\n');
+    spy.mockRestore();
+  });
+
+  it('should reply with a generic error handleRequest fails with an error without a message', async () => {
+    (cmd.Ping as jest.Mock).mock.instances[0].execute.mockImplementation(() => {
+      throw new Error();
+    });
+
+    client.write(Buffer.from('*1\r\n$4\r\nPING\r\n'));
+    await request;
+
+    expect(writeMock).toBeCalledWith('-ERR unexpected error\r\n');
   });
 });
