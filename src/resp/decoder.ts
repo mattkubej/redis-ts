@@ -76,7 +76,7 @@ function decodeBulkString(value: Buffer, readIndex: number): Token {
 
 function decodeArray(value: Buffer, readIndex: number): Token {
   const countTerm = value.indexOf(CRLF, readIndex);
-  const count = Number(value.toString('utf8', readIndex, countTerm));
+  const count = parseInt(value.toString('utf8', readIndex, countTerm), 10);
   readIndex = countTerm + CRLF.length;
 
   const elements = [];
