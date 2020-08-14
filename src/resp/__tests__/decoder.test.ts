@@ -41,4 +41,11 @@ describe('decode', () => {
       }).toThrowError('BOOM');
     });
   });
+
+  it('should throw an error when receiving an unknown prefix', () => {
+    expect(() => {
+      const data = Buffer.from('&error\r\n');
+      decode(data);
+    }).toThrowError("-ERR unknown data type prefix '&'");
+  });
 });

@@ -1,4 +1,5 @@
 import { CRLF, RESPType } from './constants';
+import { encodeError } from './encoder';
 
 type Token = {
   value: number | string | (string | number)[];
@@ -37,9 +38,10 @@ function parse(value: Buffer, readIndex = 0): Token {
     case RESPType.Error:
       decodeError(value, readIndex);
       break;
-    default:
-      // TODO: -ERR Protocol error
-      throw new Error(`Unrecognized type: ${type}`);
+    default: {
+      const message = encodeError(`unknown data type prefix '${type}'`);
+      throw new Error(message);
+    }
   }
 }
 
