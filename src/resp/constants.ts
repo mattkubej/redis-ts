@@ -2,6 +2,7 @@ export const CR = '\r';
 export const LF = '\n';
 export const CRLF = `${CR}${LF}`;
 
+// TODO: consider renaming this to prefix
 export enum RESPType {
   SimpleString = '+',
   Error = '-',
