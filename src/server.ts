@@ -56,10 +56,8 @@ export default class RedisServer {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   listen(...args: any[]): Server {
-    const server = createServer();
-
-    server.on('connection', this.handleClientConnection.bind(this));
-
-    return server.listen(...args);
+    return createServer()
+      .on('connection', this.handleClientConnection.bind(this))
+      .listen(...args);
   }
 }
