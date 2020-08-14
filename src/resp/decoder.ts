@@ -58,6 +58,7 @@ function decodeBulkString(value: Buffer, readIndex: number): Token {
   const bytes = parseInt(value.toString('utf8', readIndex, bytesTerm), 10);
   readIndex = bytesTerm + CRLF.length;
 
+  // TODO: return null byte that conforms with RESP
   if (bytes === -1) {
     return null;
   }
