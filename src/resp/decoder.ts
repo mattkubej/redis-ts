@@ -42,6 +42,7 @@ function parse(value: Buffer, readIndex = 0): Token {
   }
 }
 
+// TODO: investigate more performant solution than indexOf
 function decodeSimpleString(value: Buffer, readIndex: number): Token {
   const simpleStringTerm = value.indexOf(CRLF, readIndex);
   const simpleString = value.toString('utf8', readIndex, simpleStringTerm);
