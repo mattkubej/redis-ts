@@ -42,6 +42,13 @@ describe('decode', () => {
     });
   });
 
+  it('should throw an error when read values do not match buffer length', () => {
+    expect(() => {
+      const data = Buffer.from('*$4\r\nAB\r\n');
+      decode(data);
+    }).toThrowError('read values do not match buffer length');
+  });
+
   it('should throw an error when receiving an unknown prefix', () => {
     expect(() => {
       const data = Buffer.from('&error\r\n');

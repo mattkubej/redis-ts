@@ -5,12 +5,11 @@ type Token = {
   readIndex: number;
 };
 
-// TODO: improve error handling
 export function decode(value: Buffer): number | string | (string | number)[] {
   const { value: result, readIndex } = parse(value);
 
   if (readIndex !== value.length) {
-    throw new Error('Read values does not match buffer length.');
+    throw new Error('read values do not match buffer length');
   }
 
   if (result instanceof Array) {
