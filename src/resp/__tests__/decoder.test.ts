@@ -5,7 +5,7 @@ describe('decode', () => {
     it('should decode an encoded simple string to a string', () => {
       const data = Buffer.from('+TEST\r\n');
       const result = decode(data);
-      expect(result).toStrictEqual(['TEST']);
+      expect(result).toBe('TEST');
     });
   });
 
@@ -13,7 +13,7 @@ describe('decode', () => {
     it('should decode an encoded bulk string to a string', () => {
       const data = Buffer.from('$4\r\nTEST\r\n');
       const result = decode(data);
-      expect(result).toStrictEqual(['TEST']);
+      expect(result).toBe('TEST');
     });
   });
 
@@ -21,7 +21,7 @@ describe('decode', () => {
     it('should decode an encoded integer to a number', () => {
       const data = Buffer.from(':2\r\n');
       const result = decode(data);
-      expect(result).toStrictEqual([2]);
+      expect(result).toBe(2);
     });
   });
 

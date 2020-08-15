@@ -91,6 +91,13 @@ describe('server', () => {
     expect(executeRequest).toStrictEqual(['SET', 'test']);
   });
 
+  it('should reply with an error when receiving an ill-formed request', async () => {
+    client.write(Buffer.from('$4\r\nFAKE\r\n'));
+    await request;
+
+    expect(writeMock).toBeCalledWith('-ERR ill-formed request\r\n');
+  });
+
   it('should reply with an error when receiving an unknown command', async () => {
     client.write(Buffer.from('*1\r\n$4\r\nFAKE\r\n'));
     await request;

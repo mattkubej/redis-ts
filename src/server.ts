@@ -39,6 +39,11 @@ export default class RedisServer {
   private handleRequest(client: Socket, data: Buffer) {
     try {
       const request = decode(data);
+
+      if (!Array.isArray(request)) {
+        throw new Error(`ill-formed request`);
+      }
+
       const commandName = String(request[0]);
       const command = this.commands.get(commandName.toLowerCase());
 

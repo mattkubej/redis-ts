@@ -6,7 +6,7 @@ type Token = {
 };
 
 // TODO: improve error handling
-export function decode(value: Buffer): (string | number)[] {
+export function decode(value: Buffer): number | string | (string | number)[] {
   const { value: result, readIndex } = parse(value);
 
   if (readIndex !== value.length) {
@@ -17,8 +17,7 @@ export function decode(value: Buffer): (string | number)[] {
     return result;
   }
 
-  // TODO: might be incorrect, should not force an array
-  return [result];
+  return result;
 }
 
 // TODO: account for inline commands, support telnet
