@@ -21,7 +21,8 @@ export function decode(value: Buffer): number | string | (string | number)[] {
 
 // TODO: account for inline commands, support telnet
 function parse(value: Buffer, readIndex = 0): Token {
-  const type = value.toString('utf8', readIndex, ++readIndex);
+  const type = String.fromCharCode(value.readUInt8(readIndex));
+  readIndex++;
 
   switch (type) {
     case RESPType.SimpleString:
@@ -40,30 +41,46 @@ function parse(value: Buffer, readIndex = 0): Token {
   }
 }
 
-// TODO: investigate more performant solution than indexOf
+// TODO: clean up implementation
+function readString(value: Buffer, position = 0): string {
+  let token = '';
+  let readIndex = position;
+  let char = '';
+
+  while (char !== '\r') {
+    token += char;
+    char = String.fromCharCode(value.readUInt8(readIndex));
+    readIndex++;
+  }
+
+  const nextByte = String.fromCharCode(value.readUInt8(readIndex));
+  if (nextByte !== '\n') throw new Error('bad');
+  readIndex++;
+
+  return token;
+}
+
 function decodeSimpleString(value: Buffer, readIndex: number): Token {
-  const simpleStringTerm = value.indexOf(CRLF, readIndex);
-  const simpleString = value.toString('utf8', readIndex, simpleStringTerm);
-  readIndex = simpleStringTerm + CRLF.length;
+  const token = readString(value, readIndex);
 
   return {
-    value: simpleString,
-    readIndex,
+    value: token,
+    readIndex: readIndex + token.length + CRLF.length,
   };
 }
 
 function decodeBulkString(value: Buffer, readIndex: number): Token {
-  const bytesTerm = value.indexOf(CRLF, readIndex);
-  const bytes = parseInt(value.toString('utf8', readIndex, bytesTerm), 10);
-  readIndex = bytesTerm + CRLF.length;
+  const token = readString(value, readIndex);
+  const bytes = parseInt(token, 10);
+  readIndex += token.length + CRLF.length;
 
   // TODO: return null byte that conforms with RESP
   if (bytes === -1) {
     return null;
   }
 
-  const bulkString = value.toString('utf8', readIndex, readIndex + bytes);
-  readIndex = readIndex + bytes + CRLF.length;
+  const bulkString = readString(value, readIndex);
+  readIndex += bytes + CRLF.length;
 
   return {
     value: bulkString,
@@ -72,9 +89,9 @@ function decodeBulkString(value: Buffer, readIndex: number): Token {
 }
 
 function decodeArray(value: Buffer, readIndex: number): Token {
-  const countTerm = value.indexOf(CRLF, readIndex);
-  const count = parseInt(value.toString('utf8', readIndex, countTerm), 10);
-  readIndex = countTerm + CRLF.length;
+  const token = readString(value, readIndex);
+  const count = parseInt(token, 10);
+  readIndex += token.length + CRLF.length;
 
   const elements = [];
   for (let i = 0; i < count; i++) {
@@ -90,9 +107,9 @@ function decodeArray(value: Buffer, readIndex: number): Token {
 }
 
 function decodeInteger(value: Buffer, readIndex: number): Token {
-  const integerTerm = value.indexOf(CRLF, readIndex);
-  const integer = parseInt(value.toString('utf8', readIndex, integerTerm), 10);
-  readIndex = integerTerm + CRLF.length;
+  const token = readString(value, readIndex);
+  const integer = parseInt(token, 10);
+  readIndex += token.length + CRLF.length;
 
   return {
     value: integer,
@@ -101,8 +118,7 @@ function decodeInteger(value: Buffer, readIndex: number): Token {
 }
 
 function decodeError(value: Buffer, readIndex: number): Token {
-  const errorTerm = value.indexOf(CRLF, readIndex);
-  const error = value.toString('utf8', readIndex, errorTerm);
+  const error = readString(value, readIndex);
 
   throw new Error(error);
 }
