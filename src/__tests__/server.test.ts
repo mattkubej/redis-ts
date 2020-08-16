@@ -107,12 +107,13 @@ describe('server', () => {
 
   it('should reply with an error when receiving request with wrong arity', async () => {
     (cmd.Echo as jest.Mock).mock.instances[0].arity = 2;
+    (cmd.Echo as jest.Mock).mock.instances[0].name = 'echo';
 
     client.write(Buffer.from('*1\r\n$4\r\nECHO\r\n'));
     await request;
 
     expect(writeMock).toBeCalledWith(
-      "-ERR wrong number of arguments for 'ECHO' command\r\n"
+      "-ERR wrong number of arguments for 'echo' command\r\n"
     );
   });
 

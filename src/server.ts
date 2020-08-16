@@ -53,7 +53,7 @@ export default class RedisServer {
 
       if (command.arity > 0 && command.arity !== request.length) {
         throw new Error(
-          `wrong number of arguments for '${commandName}' command`
+          `wrong number of arguments for '${command.name}' command`
         );
       }
 
