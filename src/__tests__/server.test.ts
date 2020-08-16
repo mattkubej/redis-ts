@@ -105,6 +105,17 @@ describe('server', () => {
     expect(writeMock).toBeCalledWith("-ERR unknown command 'FAKE'\r\n");
   });
 
+  it('should reply with an error when receiving request with wrong arity', async () => {
+    (cmd.Echo as jest.Mock).mock.instances[0].arity = 2;
+
+    client.write(Buffer.from('*1\r\n$4\r\nECHO\r\n'));
+    await request;
+
+    expect(writeMock).toBeCalledWith(
+      "-ERR wrong number of arguments for 'ECHO' command\r\n"
+    );
+  });
+
   it('should reply with an error when failing to decode a request', async () => {
     const spy = jest.spyOn(decoder, 'decode').mockImplementation(() => {
       throw new Error('failed to decode request');
