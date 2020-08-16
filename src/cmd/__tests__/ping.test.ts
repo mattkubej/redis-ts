@@ -45,12 +45,29 @@ describe('ping command', () => {
       jest.clearAllMocks();
     });
 
-    it('should write PONG as a simple string back to the client', () => {
+    it('should throw an error when receiving two or more arguments', () => {
+      expect(() => {
+        const command = new Ping();
+        const client = new Socket();
+
+        command.execute(client, ['ping', 'test', 'test']);
+      }).toThrow(new Error("wrong number of arguments for 'ping' command"));
+    });
+
+    it('should reply with PONG when no message argument provided', () => {
       const command = new Ping();
       const client = new Socket();
 
       command.execute(client, ['ping']);
       expect(client.write).toBeCalledWith('+PONG\r\n');
+    });
+
+    it('should reply with the message argument when provided', () => {
+      const command = new Ping();
+      const client = new Socket();
+
+      command.execute(client, ['ping', 'test']);
+      expect(client.write).toBeCalledWith('+test\r\n');
     });
   });
 });
