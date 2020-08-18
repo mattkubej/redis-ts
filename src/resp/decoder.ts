@@ -74,9 +74,11 @@ function decodeBulkString(value: Buffer, readIndex: number): Token {
   const bytes = parseInt(token, 10);
   readIndex += token.length + CRLF.length;
 
-  // TODO: return null byte that conforms with RESP
   if (bytes === -1) {
-    return null;
+    return {
+      value: null,
+      readIndex,
+    };
   }
 
   const bulkString = readString(value, readIndex);

@@ -15,6 +15,12 @@ describe('decode', () => {
       const result = decode(data);
       expect(result).toBe('TEST');
     });
+
+    it('should decode a null encoded bulk string to null', () => {
+      const data = Buffer.from('$-1\r\n');
+      const result = decode(data);
+      expect(result).toBeNull();
+    });
   });
 
   describe('integer', () => {
