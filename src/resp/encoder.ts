@@ -1,10 +1,11 @@
-import { CRLF, RESPType } from './constants';
+import { CRLF, RESPType, NULL } from './constants';
 
 export function encodeSimpleString(value: string): string {
   return `${RESPType.SimpleString}${value}${CRLF}`;
 }
 
 export function encodeBulkString(value: string): string {
+  if (value === null) return NULL;
   return `${RESPType.BulkString}${value.length}${CRLF}${value}${CRLF}`;
 }
 

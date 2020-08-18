@@ -19,6 +19,16 @@ describe('encoder', () => {
       const result = encodeBulkString('matt');
       expect(result).toBe('$4\r\nmatt\r\n');
     });
+
+    it('should encode an empty string to a bulk string', () => {
+      const result = encodeBulkString('');
+      expect(result).toBe('$0\r\n\r\n');
+    });
+
+    it('should encode null to a null bulk string', () => {
+      const result = encodeBulkString(null);
+      expect(result).toBe('$-1\r\n');
+    });
   });
 
   describe('encodeInteger', () => {

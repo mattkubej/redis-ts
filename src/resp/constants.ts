@@ -12,3 +12,4 @@ export enum RESPType {
 }
 
 export const OK = `+OK${CRLF}`;
+export const NULL = `$-1${CRLF}`;
