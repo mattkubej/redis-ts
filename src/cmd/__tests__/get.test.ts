@@ -62,5 +62,15 @@ describe('get command', () => {
       expect(get).toHaveBeenCalledWith('mykey');
       expect(client.write).toBeCalledWith('$7\r\nmyvalue\r\n');
     });
+
+    it('it should write nil to the client if key does not exit', () => {
+      const command = new Get();
+      const client = new Socket();
+
+      command.execute(client, ['get', 'absent']);
+
+      expect(get).toHaveBeenCalledWith('absent');
+      expect(client.write).toBeCalledWith('$-1\r\n');
+    });
   });
 });
