@@ -4,7 +4,6 @@ import { encodeSimpleString } from '../resp/encoder';
 
 export default class Ping extends RedisCommand {
   constructor() {
-    // TODO: validate these are correct
     super('ping', -1, ['stale', 'fast'], 0, 0, 0);
   }
 

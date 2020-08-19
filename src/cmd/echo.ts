@@ -4,7 +4,6 @@ import { encodeBulkString } from '../resp/encoder';
 
 export default class Echo extends RedisCommand {
   constructor() {
-    // TODO: validate these are correct
     super('echo', 2, ['fast'], 0, 0, 0);
   }
 
