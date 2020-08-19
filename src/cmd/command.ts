@@ -11,6 +11,7 @@ import {
 export default class Command extends RedisCommand {
   // TODO: build map of encodedArrays on command creation
   constructor(private commands: Map<string, cmd.RedisCommand>) {
+    // TODO: validate these are correct
     super('command', -1, ['loading', 'stale'], 0, 0, 0);
   }
 

@@ -5,6 +5,7 @@ import { set } from '../db';
 
 export default class Set extends RedisCommand {
   constructor() {
+    // TODO: validate these are correct
     super('set', -3, ['write', 'denyoom'], 1, 1, 1);
   }
 
