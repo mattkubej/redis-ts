@@ -5,7 +5,7 @@ import { get } from '../db';
 
 export default class Get extends RedisCommand {
   constructor() {
-    super('get', -3, ['write', 'denyoom'], 1, 1, 1);
+    super('get', 2, ['write', 'denyoom'], 1, 1, 1);
   }
 
   // TODO: handle all variations

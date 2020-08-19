@@ -21,9 +21,9 @@ describe('get command', () => {
     expect(command.name).toBe('get');
   });
 
-  it('should have an arity of -3', () => {
+  it('should have an arity of 2', () => {
     const command = new Get();
-    expect(command.arity).toBe(-3);
+    expect(command.arity).toBe(2);
   });
 
   it('should have the flag(s): write, denyoom', () => {
