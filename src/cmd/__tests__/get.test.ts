@@ -26,11 +26,11 @@ describe('get command', () => {
     expect(command.arity).toBe(2);
   });
 
-  it('should have the flag(s): write, denyoom', () => {
+  it('should have the flag(s): write, fast', () => {
     const command = new Get();
     expect(command.flags.length).toBe(2);
-    expect(command.flags[0]).toBe('write');
-    expect(command.flags[1]).toBe('denyoom');
+    expect(command.flags[0]).toBe('readonly');
+    expect(command.flags[1]).toBe('fast');
   });
 
   it('should have a firstKey of 1', () => {

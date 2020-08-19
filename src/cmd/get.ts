@@ -6,8 +6,7 @@ import { NULL } from '../resp/constants';
 
 export default class Get extends RedisCommand {
   constructor() {
-    // TODO: validate these are correct
-    super('get', 2, ['write', 'denyoom'], 1, 1, 1);
+    super('get', 2, ['readonly', 'fast'], 1, 1, 1);
   }
 
   execute(client: Socket, request: (number | string)[]): void {
