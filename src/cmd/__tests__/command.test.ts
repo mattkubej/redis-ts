@@ -4,8 +4,8 @@ import RedisCommand from '../redis-command';
 
 jest.mock('net', () => ({
   Socket: () => ({
-    write: jest.fn()
-  })
+    write: jest.fn(),
+  }),
 }));
 
 class DummyClass extends RedisCommand {
@@ -111,7 +111,7 @@ describe('command command', () => {
       );
     });
 
-    it.only("should reply with the requested command's when receiving 'info [name1] [name2] ...", () => {
+    it("should reply with the requested command's when receiving 'info [name1] [name2] ...", () => {
       const commands = new Map();
       commands.set('dummy1', new DummyClass('dummy1'));
       commands.set('dummy2', new DummyClass('dummy2'));
@@ -125,7 +125,7 @@ describe('command command', () => {
         'info',
         'dummy1',
         'dummy2',
-        'dummy3'
+        'dummy3',
       ]);
 
       expect(client.write).toBeCalledWith(
@@ -189,7 +189,7 @@ describe('command command', () => {
 
       command.execute(client, ['command', 'count']);
 
-      expect(client.write).toBeCalledWith(':3\r\n');
+      expect(client.write).toBeCalledWith(':4\r\n');
     });
 
     it('should throw an error when receiving an unknown subcommand', () => {
