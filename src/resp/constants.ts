@@ -11,5 +11,6 @@ export enum RESPType {
   Array = '*',
 }
 
+// TODO: pull from prefixes
 export const OK = `+OK${CRLF}`;
 export const NULL = `$-1${CRLF}`;

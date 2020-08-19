@@ -9,21 +9,25 @@ import {
 } from '../resp/encoder';
 
 export default class Command extends RedisCommand {
-  constructor(public commands: Map<string, cmd.RedisCommand>) {
+  // TODO: build map of encodedArrays on command creation
+  constructor(private commands: Map<string, cmd.RedisCommand>) {
     super('command', -1, ['loading', 'stale'], 0, 0, 0);
   }
 
-  // TODO: handle all variations
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // TODO: can this get cleaned up?
   execute(client: Socket, request: (number | string)[]): void {
-    const allDetails = [this.addCommandReply(this)];
-
-    this.commands.forEach((cmd) => {
-      allDetails.push(this.addCommandReply(cmd));
-    });
-
-    const reply = encodeArray(allDetails);
-    client.write(reply);
+    if (request.length === 1) {
+      this.sendAllDetails(client);
+    } else if (String(request[1]).toLowerCase() === 'info') {
+      this.sendDetails(client, request);
+    } else if (
+      String(request[1]).toLowerCase() === 'count' &&
+      request.length === 2
+    ) {
+      this.sendCount(client);
+    } else {
+      throw new Error('unknown subcommand or wrong number of arguments');
+    }
   }
 
   private addCommandReply(cmd: cmd.RedisCommand): string {
@@ -40,5 +44,40 @@ export default class Command extends RedisCommand {
     details.push(encodeInteger(cmd.keyStep));
 
     return encodeArray(details);
+  }
+
+  private sendAllDetails(client: Socket) {
+    const allDetails = [this.addCommandReply(this)];
+
+    this.commands.forEach((cmd) => {
+      allDetails.push(this.addCommandReply(cmd));
+    });
+
+    const reply = encodeArray(allDetails);
+    client.write(reply);
+  }
+
+  // TODO: clean this up?
+  private sendDetails(client: Socket, request: (number | string)[]) {
+    const details = [];
+
+    for (let i = 2; i < request.length; i++) {
+      const cmdName = String(request[i]).toLowerCase();
+      const command = cmdName === this.name ? this : this.commands.get(cmdName);
+
+      const detail = command
+        ? this.addCommandReply(command)
+        : encodeBulkString(null);
+
+      details.push(detail);
+    }
+
+    const reply = encodeArray(details);
+    client.write(reply);
+  }
+
+  private sendCount(client: Socket) {
+    const reply = encodeInteger(this.commands.size + 1);
+    client.write(reply);
   }
 }
