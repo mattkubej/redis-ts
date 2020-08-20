@@ -58,6 +58,7 @@ describe('set command', () => {
       command.execute(client, ['set', 'mykey', 'myvalue']);
 
       expect(set).toHaveBeenCalledWith('mykey', 'myvalue');
+      expect(client.write).toHaveBeenCalledTimes(1);
       expect(client.write).toBeCalledWith('+OK\r\n');
     });
 
@@ -68,6 +69,7 @@ describe('set command', () => {
       command.execute(client, ['set', 'mykey', 'myvalue', 'NX']);
 
       expect(set).toHaveBeenCalledWith('mykey', 'myvalue');
+      expect(client.write).toHaveBeenCalledTimes(1);
       expect(client.write).toBeCalledWith('+OK\r\n');
     });
 
@@ -82,6 +84,7 @@ describe('set command', () => {
       command.execute(client, ['set', 'mykey', 'myvalue', 'NX']);
 
       expect(set).not.toHaveBeenCalledWith('mykey', 'myvalue');
+      expect(client.write).toHaveBeenCalledTimes(1);
       expect(client.write).toBeCalledWith('$-1\r\n');
     });
 
@@ -96,6 +99,7 @@ describe('set command', () => {
       command.execute(client, ['set', 'mykey', 'myvalue', 'XX']);
 
       expect(set).toHaveBeenCalledWith('mykey', 'myvalue');
+      expect(client.write).toHaveBeenCalledTimes(1);
       expect(client.write).toBeCalledWith('+OK\r\n');
     });
 
@@ -106,16 +110,18 @@ describe('set command', () => {
       command.execute(client, ['set', 'mykey', 'myvalue', 'XX']);
 
       expect(set).not.toHaveBeenCalledWith('mykey', 'myvalue');
+      expect(client.write).toHaveBeenCalledTimes(1);
       expect(client.write).toBeCalledWith('$-1\r\n');
     });
 
     it('should throw a syntax error when receiving unknown options', () => {
-      expect(() => {
-        const command = new SetCommand();
-        const client = new Socket();
+      const command = new SetCommand();
+      const client = new Socket();
 
+      expect(() => {
         command.execute(client, ['set', 'mykey', 'myvalue', 'MM']);
       }).toThrow(new Error('syntax error'));
+      expect(client.write).toHaveBeenCalledTimes(0);
     });
   });
 });
