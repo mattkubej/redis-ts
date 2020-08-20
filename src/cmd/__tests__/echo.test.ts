@@ -49,6 +49,8 @@ describe('echo command', () => {
       const client = new Socket();
 
       command.execute(client, ['echo', 'hello world']);
+
+      expect(client.write).toHaveBeenCalledTimes(1);
       expect(client.write).toBeCalledWith('$11\r\nhello world\r\n');
     });
 
@@ -57,6 +59,8 @@ describe('echo command', () => {
       const client = new Socket();
 
       command.execute(client, ['echo', 24]);
+
+      expect(client.write).toHaveBeenCalledTimes(1);
       expect(client.write).toBeCalledWith('$2\r\n24\r\n');
     });
   });
