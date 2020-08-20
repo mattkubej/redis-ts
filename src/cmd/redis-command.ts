@@ -1,4 +1,5 @@
 import { Socket } from 'net';
+import { Data } from '../resp/decoder';
 
 export default abstract class RedisCommand {
   constructor(
@@ -10,5 +11,5 @@ export default abstract class RedisCommand {
     public keyStep: number
   ) {}
 
-  abstract execute(client: Socket, request: (number | string)[]): void;
+  abstract execute(client: Socket, request: Data[]): void;
 }

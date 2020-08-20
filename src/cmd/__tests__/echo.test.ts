@@ -2,9 +2,9 @@ import Echo from '../echo';
 import { Socket } from 'net';
 
 jest.mock('net', () => ({
-  Socket: () => ({
+  Socket: jest.fn().mockImplementation(() => ({
     write: jest.fn(),
-  }),
+  })),
 }));
 
 describe('echo command', () => {

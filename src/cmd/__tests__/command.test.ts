@@ -3,9 +3,9 @@ import { Socket } from 'net';
 import RedisCommand from '../redis-command';
 
 jest.mock('net', () => ({
-  Socket: () => ({
+  Socket: jest.fn().mockImplementation(() => ({
     write: jest.fn(),
-  }),
+  })),
 }));
 
 class DummyClass extends RedisCommand {

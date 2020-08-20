@@ -3,13 +3,13 @@ import { Socket } from 'net';
 import { get } from '../../db';
 
 jest.mock('net', () => ({
-  Socket: () => ({
+  Socket: jest.fn().mockImplementation(() => ({
     write: jest.fn(),
-  }),
+  })),
 }));
 
 jest.mock('../../db', () => ({
-  get: jest.fn().mockImplementation((key: string): string | null => {
+  get: jest.fn().mockImplementation((key: string): string | undefined => {
     if (key === 'mykey') return 'myvalue';
     return undefined;
   }),

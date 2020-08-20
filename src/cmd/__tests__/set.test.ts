@@ -1,16 +1,18 @@
 import SetCommand from '../set';
 import { Socket } from 'net';
-import { get, set } from '../../db';
+import { set } from '../../db';
 
 jest.mock('net', () => ({
-  Socket: () => ({
+  Socket: jest.fn().mockImplementation(() => ({
     write: jest.fn(),
-  }),
+  })),
 }));
 
 jest.mock('../../db', () => ({
   set: jest.fn(),
-  get: jest.fn().mockImplementation(() => undefined),
+  get: jest
+    .fn()
+    .mockImplementation((key) => (key === 'mykey' ? 'myvalue' : undefined)),
 }));
 
 describe('set command', () => {
@@ -48,7 +50,7 @@ describe('set command', () => {
 
   describe('execute', () => {
     beforeEach(() => {
-      jest.resetAllMocks();
+      jest.clearAllMocks();
     });
 
     it('should save the key and value to the db and respond with OK to the client', () => {
@@ -66,18 +68,14 @@ describe('set command', () => {
       const command = new SetCommand();
       const client = new Socket();
 
-      command.execute(client, ['set', 'mykey', 'myvalue', 'NX']);
+      command.execute(client, ['set', 'absent', 'myvalue', 'NX']);
 
-      expect(set).toHaveBeenCalledWith('mykey', 'myvalue');
+      expect(set).toHaveBeenCalledWith('absent', 'myvalue');
       expect(client.write).toHaveBeenCalledTimes(1);
       expect(client.write).toBeCalledWith('+OK\r\n');
     });
 
     it('should not save the key and value when NX is provided and the key exists', () => {
-      (get as jest.Mock).mockImplementation((key) => {
-        return key === 'mykey' ? 'myvalue' : undefined;
-      });
-
       const command = new SetCommand();
       const client = new Socket();
 
@@ -89,10 +87,6 @@ describe('set command', () => {
     });
 
     it('should save the key and value when XX is provided and the key exists', () => {
-      (get as jest.Mock).mockImplementation((key) => {
-        return key === 'mykey' ? 'myvalue' : undefined;
-      });
-
       const command = new SetCommand();
       const client = new Socket();
 
@@ -107,9 +101,9 @@ describe('set command', () => {
       const command = new SetCommand();
       const client = new Socket();
 
-      command.execute(client, ['set', 'mykey', 'myvalue', 'XX']);
+      command.execute(client, ['set', 'absent', 'myvalue', 'XX']);
 
-      expect(set).not.toHaveBeenCalledWith('mykey', 'myvalue');
+      expect(set).not.toHaveBeenCalledWith('absent', 'myvalue');
       expect(client.write).toHaveBeenCalledTimes(1);
       expect(client.write).toBeCalledWith('$-1\r\n');
     });

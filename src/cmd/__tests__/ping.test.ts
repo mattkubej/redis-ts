@@ -2,9 +2,9 @@ import Ping from '../ping';
 import { Socket } from 'net';
 
 jest.mock('net', () => ({
-  Socket: () => ({
+  Socket: jest.fn().mockImplementation(() => ({
     write: jest.fn(),
-  }),
+  })),
 }));
 
 describe('ping command', () => {

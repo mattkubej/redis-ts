@@ -1,11 +1,14 @@
 import { CRLF, RESPType } from './constants';
 
+// TODO: consider reorganizing and renaming
+export type Data = number | null | string | Data[];
+
 type Token = {
-  value: number | string | (string | number)[];
+  value: Data;
   readIndex: number;
 };
 
-export function decode(value: Buffer): number | string | (string | number)[] {
+export function decode(value: Buffer): Data {
   const { value: result, readIndex } = parse(value);
 
   if (readIndex !== value.length) {
@@ -33,9 +36,10 @@ function parse(value: Buffer, readIndex = 0): Token {
       return decodeArray(value, readIndex);
     case RESPType.Integer:
       return decodeInteger(value, readIndex);
-    case RESPType.Error:
-      decodeError(value, readIndex);
-      break;
+    case RESPType.Error: {
+      const error = readString(value, readIndex);
+      throw new Error(error);
+    }
     default:
       throw new Error(`unknown data type prefix '${type}'`);
   }
@@ -117,10 +121,4 @@ function decodeInteger(value: Buffer, readIndex: number): Token {
     value: integer,
     readIndex,
   };
-}
-
-function decodeError(value: Buffer, readIndex: number): Token {
-  const error = readString(value, readIndex);
-
-  throw new Error(error);
 }
