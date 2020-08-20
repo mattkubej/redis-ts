@@ -11,7 +11,7 @@ jest.mock('net', () => ({
 jest.mock('../../db', () => ({
   get: jest.fn().mockImplementation((key: string): string | null => {
     if (key === 'mykey') return 'myvalue';
-    return null;
+    return undefined;
   }),
 }));
 
@@ -60,6 +60,7 @@ describe('get command', () => {
       command.execute(client, ['get', 'mykey']);
 
       expect(get).toHaveBeenCalledWith('mykey');
+      expect(client.write).toHaveBeenCalledTimes(1);
       expect(client.write).toBeCalledWith('$7\r\nmyvalue\r\n');
     });
 
@@ -70,6 +71,7 @@ describe('get command', () => {
       command.execute(client, ['get', 'absent']);
 
       expect(get).toHaveBeenCalledWith('absent');
+      expect(client.write).toHaveBeenCalledTimes(1);
       expect(client.write).toBeCalledWith('$-1\r\n');
     });
   });
