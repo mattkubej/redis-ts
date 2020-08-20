@@ -105,7 +105,7 @@ describe('server', () => {
     expect(writeMock).toBeCalledWith("-ERR unknown command 'FAKE'\r\n");
   });
 
-  it('should reply with an error when receiving request with wrong arity', async () => {
+  it('should reply with an error when a positive arity does not exactly match request length', async () => {
     (cmd.Echo as jest.Mock).mock.instances[0].arity = 2;
     (cmd.Echo as jest.Mock).mock.instances[0].name = 'echo';
 
@@ -114,6 +114,18 @@ describe('server', () => {
 
     expect(writeMock).toBeCalledWith(
       "-ERR wrong number of arguments for 'echo' command\r\n"
+    );
+  });
+
+  it('should reply with an error when the request length is less than the absolute value of arity', async () => {
+    (cmd.Set as jest.Mock).mock.instances[0].arity = -3;
+    (cmd.Set as jest.Mock).mock.instances[0].name = 'set';
+
+    client.write(Buffer.from('*2\r\n$3\r\nSET\r\n$3\r\nkey\r\n'));
+    await request;
+
+    expect(writeMock).toBeCalledWith(
+      "-ERR wrong number of arguments for 'set' command\r\n"
     );
   });
 

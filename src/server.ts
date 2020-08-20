@@ -51,7 +51,10 @@ export default class RedisServer {
         throw new Error(`unknown command '${commandName}'`);
       }
 
-      if (command.arity > 0 && command.arity !== request.length) {
+      if (
+        (command.arity > 0 && command.arity !== request.length) ||
+        request.length < -command.arity
+      ) {
         throw new Error(
           `wrong number of arguments for '${command.name}' command`
         );
