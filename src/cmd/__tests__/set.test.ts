@@ -1,6 +1,6 @@
 import SetCommand from '../set';
 import { Socket } from 'net';
-import { set } from '../../db';
+import { get, set } from '../../db';
 
 jest.mock('net', () => ({
   Socket: () => ({
@@ -10,6 +10,7 @@ jest.mock('net', () => ({
 
 jest.mock('../../db', () => ({
   set: jest.fn(),
+  get: jest.fn().mockImplementation(() => undefined),
 }));
 
 describe('set command', () => {
@@ -47,10 +48,10 @@ describe('set command', () => {
 
   describe('execute', () => {
     beforeEach(() => {
-      jest.clearAllMocks();
+      jest.resetAllMocks();
     });
 
-    it('it should save the key and value to the db and respond with OK to the client', () => {
+    it('should save the key and value to the db and respond with OK to the client', () => {
       const command = new SetCommand();
       const client = new Socket();
 
@@ -58,6 +59,63 @@ describe('set command', () => {
 
       expect(set).toHaveBeenCalledWith('mykey', 'myvalue');
       expect(client.write).toBeCalledWith('+OK\r\n');
+    });
+
+    it('should save the key and value when NX is provided and the key does not exist', () => {
+      const command = new SetCommand();
+      const client = new Socket();
+
+      command.execute(client, ['set', 'mykey', 'myvalue', 'NX']);
+
+      expect(set).toHaveBeenCalledWith('mykey', 'myvalue');
+      expect(client.write).toBeCalledWith('+OK\r\n');
+    });
+
+    it('should not save the key and value when NX is provided and the key exists', () => {
+      (get as jest.Mock).mockImplementation((key) => {
+        return key === 'mykey' ? 'myvalue' : undefined;
+      });
+
+      const command = new SetCommand();
+      const client = new Socket();
+
+      command.execute(client, ['set', 'mykey', 'myvalue', 'NX']);
+
+      expect(set).not.toHaveBeenCalledWith('mykey', 'myvalue');
+      expect(client.write).toBeCalledWith('$-1\r\n');
+    });
+
+    it('should save the key and value when XX is provided and the key exists', () => {
+      (get as jest.Mock).mockImplementation((key) => {
+        return key === 'mykey' ? 'myvalue' : undefined;
+      });
+
+      const command = new SetCommand();
+      const client = new Socket();
+
+      command.execute(client, ['set', 'mykey', 'myvalue', 'XX']);
+
+      expect(set).toHaveBeenCalledWith('mykey', 'myvalue');
+      expect(client.write).toBeCalledWith('+OK\r\n');
+    });
+
+    it('should not save the key and value when XX is provided and the key does not exist', () => {
+      const command = new SetCommand();
+      const client = new Socket();
+
+      command.execute(client, ['set', 'mykey', 'myvalue', 'XX']);
+
+      expect(set).not.toHaveBeenCalledWith('mykey', 'myvalue');
+      expect(client.write).toBeCalledWith('$-1\r\n');
+    });
+
+    it('should throw a syntax error when receiving unknown options', () => {
+      expect(() => {
+        const command = new SetCommand();
+        const client = new Socket();
+
+        command.execute(client, ['set', 'mykey', 'myvalue', 'MM']);
+      }).toThrow(new Error('syntax error'));
     });
   });
 });
