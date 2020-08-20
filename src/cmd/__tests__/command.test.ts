@@ -113,6 +113,28 @@ describe('command command', () => {
       );
     });
 
+    it("should reply with the command's command info when receiving 'info command'", () => {
+      const command = new Command(new Map());
+      const client = new Socket();
+
+      command.execute(client, ['command', 'info', 'command']);
+
+      expect(client.write).toHaveBeenCalledTimes(1);
+      expect(client.write).toBeCalledWith(
+        '*1\r\n' +
+          '*6\r\n' +
+          '$7\r\n' +
+          'command\r\n' +
+          ':-1\r\n' +
+          '*2\r\n' +
+          '+loading\r\n' +
+          '+stale\r\n' +
+          ':0\r\n' +
+          ':0\r\n' +
+          ':0\r\n'
+      );
+    });
+
     it("should reply with the requested command's when receiving 'info [name1] [name2] ...", () => {
       const commands = new Map();
       commands.set('dummy1', new DummyClass('dummy1'));
