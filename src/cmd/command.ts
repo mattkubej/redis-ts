@@ -15,6 +15,7 @@ export default class Command extends RedisCommand {
   }
 
   // TODO: can this get cleaned up?
+  // TODO: match abstract class
   execute(client: Socket, request: (number | string)[]): void {
     if (request.length === 1) {
       this.sendAllDetails(client);

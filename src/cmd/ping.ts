@@ -7,6 +7,7 @@ export default class Ping extends RedisCommand {
     super('ping', -1, ['stale', 'fast'], 0, 0, 0);
   }
 
+  // TODO: match abstract class
   execute(client: Socket, request: (number | string)[]): void {
     if (request.length > 2) {
       throw new Error(`wrong number of arguments for '${this.name}' command`);

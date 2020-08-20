@@ -9,6 +9,7 @@ export default class Set extends RedisCommand {
   }
 
   // TODO: clean this up
+  // TODO: match abstract class
   execute(client: Socket, request: (number | string)[]): void {
     const key = String(request[1]);
     const value = String(request[2]);
