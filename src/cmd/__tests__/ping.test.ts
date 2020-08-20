@@ -46,12 +46,13 @@ describe('ping command', () => {
     });
 
     it('should throw an error when receiving two or more arguments', () => {
-      expect(() => {
-        const command = new Ping();
-        const client = new Socket();
+      const command = new Ping();
+      const client = new Socket();
 
+      expect(() => {
         command.execute(client, ['ping', 'test', 'test']);
       }).toThrow(new Error("wrong number of arguments for 'ping' command"));
+      expect(client.write).toHaveBeenCalledTimes(0);
     });
 
     it('should reply with PONG when no message argument provided', () => {
@@ -59,6 +60,8 @@ describe('ping command', () => {
       const client = new Socket();
 
       command.execute(client, ['ping']);
+
+      expect(client.write).toHaveBeenCalledTimes(1);
       expect(client.write).toBeCalledWith('+PONG\r\n');
     });
 
@@ -67,6 +70,8 @@ describe('ping command', () => {
       const client = new Socket();
 
       command.execute(client, ['ping', 'test']);
+
+      expect(client.write).toHaveBeenCalledTimes(1);
       expect(client.write).toBeCalledWith('+test\r\n');
     });
   });
