@@ -64,6 +64,7 @@ describe('command command', () => {
 
       command.execute(client, ['command']);
 
+      expect(client.write).toHaveBeenCalledTimes(1);
       expect(client.write).toBeCalledWith(
         '*2\r\n' +
           '*6\r\n' +
@@ -97,6 +98,7 @@ describe('command command', () => {
 
       command.execute(client, ['command', 'info', 'dummy']);
 
+      expect(client.write).toHaveBeenCalledTimes(1);
       expect(client.write).toBeCalledWith(
         '*1\r\n' +
           '*6\r\n' +
@@ -128,6 +130,7 @@ describe('command command', () => {
         'dummy3',
       ]);
 
+      expect(client.write).toHaveBeenCalledTimes(1);
       expect(client.write).toBeCalledWith(
         '*3\r\n' +
           '*6\r\n' +
@@ -166,6 +169,7 @@ describe('command command', () => {
 
       command.execute(client, ['command', 'info', 'dummy']);
 
+      expect(client.write).toHaveBeenCalledTimes(1);
       expect(client.write).toBeCalledWith('*1\r\n$-1\r\n');
     });
 
@@ -175,6 +179,7 @@ describe('command command', () => {
 
       command.execute(client, ['command', 'info']);
 
+      expect(client.write).toHaveBeenCalledTimes(1);
       expect(client.write).toBeCalledWith('*0\r\n');
     });
 
@@ -189,25 +194,27 @@ describe('command command', () => {
 
       command.execute(client, ['command', 'count']);
 
+      expect(client.write).toHaveBeenCalledTimes(1);
       expect(client.write).toBeCalledWith(':4\r\n');
     });
 
     it('should throw an error when receiving an unknown subcommand', () => {
-      expect(() => {
-        const command = new Command(new Map());
-        const client = new Socket();
+      const command = new Command(new Map());
+      const client = new Socket();
 
+      expect(() => {
         command.execute(client, ['command', 'fake']);
       }).toThrow(new Error('unknown subcommand or wrong number of arguments'));
+      expect(client.write).toHaveBeenCalledTimes(0);
     });
 
     it("should throw an error when receiving too many arguments for 'count'", () => {
+      const client = new Socket();
+      const command = new Command(new Map());
       expect(() => {
-        const command = new Command(new Map());
-        const client = new Socket();
-
         command.execute(client, ['command', 'count', 'extra']);
       }).toThrow(new Error('unknown subcommand or wrong number of arguments'));
+      expect(client.write).toHaveBeenCalledTimes(0);
     });
   });
 });
