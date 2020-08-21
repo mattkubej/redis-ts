@@ -1,7 +1,4 @@
-import { CRLF, RESPType } from './constants';
-
-// TODO: consider reorganizing and renaming
-export type Data = number | null | string | Data[];
+import { Data, CRLF, RESPType } from './constants';
 
 type Token = {
   value: Data;

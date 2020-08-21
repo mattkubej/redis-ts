@@ -1,6 +1,7 @@
 import RedisCommand from './redis-command';
 import { Socket } from 'net';
 import { encodeSimpleString } from '../resp/encoder';
+import { Data } from '../resp/constants';
 
 export default class Ping extends RedisCommand {
   constructor() {
@@ -8,7 +9,7 @@ export default class Ping extends RedisCommand {
   }
 
   // TODO: match abstract class
-  execute(client: Socket, request: (number | string)[]): void {
+  execute(client: Socket, request: Data[]): void {
     if (request.length > 2) {
       throw new Error(`wrong number of arguments for '${this.name}' command`);
     }

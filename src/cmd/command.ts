@@ -7,6 +7,7 @@ import {
   encodeInteger,
   encodeSimpleString,
 } from '../resp/encoder';
+import { Data } from '../resp/constants';
 
 export default class Command extends RedisCommand {
   // TODO: build map of encodedArrays on command creation
@@ -15,8 +16,7 @@ export default class Command extends RedisCommand {
   }
 
   // TODO: can this get cleaned up?
-  // TODO: match abstract class
-  execute(client: Socket, request: (number | string)[]): void {
+  execute(client: Socket, request: Data[]): void {
     if (request.length === 1) {
       this.sendAllDetails(client);
     } else if (String(request[1]).toLowerCase() === 'info') {
@@ -59,7 +59,7 @@ export default class Command extends RedisCommand {
   }
 
   // TODO: clean this up?
-  private sendDetails(client: Socket, request: (number | string)[]) {
+  private sendDetails(client: Socket, request: Data[]) {
     const details = [];
 
     for (let i = 2; i < request.length; i++) {

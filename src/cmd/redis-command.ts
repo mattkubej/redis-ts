@@ -1,5 +1,5 @@
 import { Socket } from 'net';
-import { Data } from '../resp/decoder';
+import { Data } from '../resp/constants';
 
 export default abstract class RedisCommand {
   constructor(

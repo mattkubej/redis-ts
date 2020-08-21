@@ -2,6 +2,7 @@ import RedisCommand from './redis-command';
 import { Socket } from 'net';
 import { NULL, OK } from '../resp/constants';
 import { get, set } from '../db';
+import { Data } from '../resp/constants';
 
 export default class Set extends RedisCommand {
   constructor() {
@@ -9,8 +10,7 @@ export default class Set extends RedisCommand {
   }
 
   // TODO: clean this up
-  // TODO: match abstract class
-  execute(client: Socket, request: (number | string)[]): void {
+  execute(client: Socket, request: Data[]): void {
     const key = String(request[1]);
     const value = String(request[2]);
     const option = request[3] ? String(request[3]).toLowerCase() : undefined;
