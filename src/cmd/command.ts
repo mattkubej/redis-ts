@@ -1,6 +1,5 @@
 import RedisCommand from './redis-command';
 import { Socket } from 'net';
-import * as cmd from './index';
 import {
   encodeArray,
   encodeBulkString,
@@ -11,7 +10,7 @@ import { Data } from '../resp/constants';
 
 export default class Command extends RedisCommand {
   // TODO: build map of encodedArrays on command creation
-  constructor(private commands: Map<string, cmd.RedisCommand>) {
+  constructor(private commands: Map<string, RedisCommand>) {
     super('command', -1, ['loading', 'stale'], 0, 0, 0);
   }
 
@@ -31,7 +30,7 @@ export default class Command extends RedisCommand {
     }
   }
 
-  private addCommandReply(cmd: cmd.RedisCommand): string {
+  private addCommandReply(cmd: RedisCommand): string {
     const details = [];
 
     details.push(encodeBulkString(cmd.name));
