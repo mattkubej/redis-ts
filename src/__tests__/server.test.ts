@@ -8,6 +8,7 @@ jest.mock('../cmd/get');
 jest.mock('../cmd/ping');
 jest.mock('../cmd/quit');
 jest.mock('../cmd/set');
+jest.mock('../cmd/command');
 
 describe('server', () => {
   let redisServer: RedisServer;
@@ -103,6 +104,20 @@ describe('server', () => {
     expect(executeClient instanceof Socket).toBeTruthy();
     expect(executeClient.server).toBe(server);
     expect(executeRequest).toStrictEqual(['SET', 'test']);
+  });
+
+  it('should invoke the command command with a command request', async () => {
+    client.write(Buffer.from('*1\r\n$7\r\nCOMMAND\r\n'));
+    await request;
+
+    const mockExecute = (cmd.Command as jest.Mock).mock.instances[0].execute
+      .mock;
+    const executeClient = mockExecute.calls[0][0];
+    const executeRequest = mockExecute.calls[0][1];
+
+    expect(executeClient instanceof Socket).toBeTruthy();
+    expect(executeClient.server).toBe(server);
+    expect(executeRequest).toStrictEqual(['COMMAND']);
   });
 
   it('should reply with an error when receiving an ill-formed request', async () => {
