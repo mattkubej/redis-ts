@@ -45,7 +45,8 @@ describe('server', () => {
     client.write(Buffer.from('*2\r\n$4\r\nECHO\r\n$4\r\ntest\r\n'));
     await request;
 
-    const mockExecute = (cmd.Echo as jest.Mock).mock.instances[0].execute.mock;
+    const mockCommand = cmd.Echo as jest.Mock;
+    const mockExecute = mockCommand.mock.instances[0].execute.mock;
     const executeClient = mockExecute.calls[0][0];
     const executeRequest = mockExecute.calls[0][1];
 
@@ -58,7 +59,8 @@ describe('server', () => {
     client.write(Buffer.from('*2\r\n$3\r\nGET\r\n$4\r\ntest\r\n'));
     await request;
 
-    const mockExecute = (cmd.Get as jest.Mock).mock.instances[0].execute.mock;
+    const mockCommand = cmd.Get as jest.Mock;
+    const mockExecute = mockCommand.mock.instances[0].execute.mock;
     const executeClient = mockExecute.calls[0][0];
     const executeRequest = mockExecute.calls[0][1];
 
@@ -71,7 +73,8 @@ describe('server', () => {
     client.write(Buffer.from('*2\r\n$4\r\nPING\r\n$4\r\ntest\r\n'));
     await request;
 
-    const mockExecute = (cmd.Ping as jest.Mock).mock.instances[0].execute.mock;
+    const mockCommand = cmd.Ping as jest.Mock;
+    const mockExecute = mockCommand.mock.instances[0].execute.mock;
     const executeClient = mockExecute.calls[0][0];
     const executeRequest = mockExecute.calls[0][1];
 
@@ -84,7 +87,8 @@ describe('server', () => {
     client.write(Buffer.from('*1\r\n$4\r\nQUIT\r\n'));
     await request;
 
-    const mockExecute = (cmd.Quit as jest.Mock).mock.instances[0].execute.mock;
+    const mockCommand = cmd.Quit as jest.Mock;
+    const mockExecute = mockCommand.mock.instances[0].execute.mock;
     const executeClient = mockExecute.calls[0][0];
     const executeRequest = mockExecute.calls[0][1];
 
@@ -97,7 +101,8 @@ describe('server', () => {
     client.write(Buffer.from('*2\r\n$3\r\nSET\r\n$4\r\ntest\r\n'));
     await request;
 
-    const mockExecute = (cmd.Set as jest.Mock).mock.instances[0].execute.mock;
+    const mockCommand = cmd.Set as jest.Mock;
+    const mockExecute = mockCommand.mock.instances[0].execute.mock;
     const executeClient = mockExecute.calls[0][0];
     const executeRequest = mockExecute.calls[0][1];
 
@@ -110,8 +115,8 @@ describe('server', () => {
     client.write(Buffer.from('*1\r\n$7\r\nCOMMAND\r\n'));
     await request;
 
-    const mockExecute = (cmd.Command as jest.Mock).mock.instances[0].execute
-      .mock;
+    const mockCommand = cmd.Command as jest.Mock;
+    const mockExecute = mockCommand.mock.instances[0].execute.mock;
     const executeClient = mockExecute.calls[0][0];
     const executeRequest = mockExecute.calls[0][1];
 
