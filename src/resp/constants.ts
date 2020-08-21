@@ -13,6 +13,5 @@ export enum RESPType {
   Array = '*',
 }
 
-// TODO: pull from prefixes
-export const OK = `+OK${CRLF}`;
-export const NULL = `$-1${CRLF}`;
+export const OK = `${RESPType.SimpleString}OK${CRLF}`;
+export const NULL = `${RESPType.BulkString}-1${CRLF}`;
