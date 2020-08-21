@@ -15,6 +15,7 @@ export default class RedisServer {
     this.commands.set('echo', new cmd.Echo());
     this.commands.set('get', new cmd.Get());
     this.commands.set('ping', new cmd.Ping());
+    this.commands.set('quit', new cmd.Quit());
     this.commands.set('set', new cmd.Set());
 
     // cloning map to avoid circular dependency

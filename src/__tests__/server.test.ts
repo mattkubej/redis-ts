@@ -6,6 +6,7 @@ import * as decoder from '../resp/decoder';
 jest.mock('../cmd/echo');
 jest.mock('../cmd/get');
 jest.mock('../cmd/ping');
+jest.mock('../cmd/quit');
 jest.mock('../cmd/set');
 
 describe('server', () => {
@@ -76,6 +77,19 @@ describe('server', () => {
     expect(executeClient instanceof Socket).toBeTruthy();
     expect(executeClient.server).toBe(server);
     expect(executeRequest).toStrictEqual(['PING', 'test']);
+  });
+
+  it('should invoke the quit command with a quit request', async () => {
+    client.write(Buffer.from('*1\r\n$4\r\nQUIT\r\n'));
+    await request;
+
+    const mockExecute = (cmd.Quit as jest.Mock).mock.instances[0].execute.mock;
+    const executeClient = mockExecute.calls[0][0];
+    const executeRequest = mockExecute.calls[0][1];
+
+    expect(executeClient instanceof Socket).toBeTruthy();
+    expect(executeClient.server).toBe(server);
+    expect(executeRequest).toStrictEqual(['QUIT']);
   });
 
   it('should invoke the set command with a set request', async () => {
