@@ -10,4 +10,5 @@ Communicates with clients utilizing the RESP protocol (i.e. redis-client).
 * ECHO
 * GET
 * PING
+* QUIT
 * SET
