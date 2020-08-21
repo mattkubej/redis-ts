@@ -4,8 +4,7 @@ export const CR = '\r';
 export const LF = '\n';
 export const CRLF = `${CR}${LF}`;
 
-// TODO: consider renaming this to prefix
-export enum RESPType {
+export enum Prefix {
   SimpleString = '+',
   Error = '-',
   Integer = ':',
@@ -13,5 +12,5 @@ export enum RESPType {
   Array = '*',
 }
 
-export const OK = `${RESPType.SimpleString}OK${CRLF}`;
-export const NULL = `${RESPType.BulkString}-1${CRLF}`;
+export const OK = `${Prefix.SimpleString}OK${CRLF}`;
+export const NULL = `${Prefix.BulkString}-1${CRLF}`;

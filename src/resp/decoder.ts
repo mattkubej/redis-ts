@@ -1,4 +1,4 @@
-import { Data, CRLF, RESPType } from './constants';
+import { Data, CRLF, Prefix } from './constants';
 
 type Token = {
   value: Data;
@@ -21,24 +21,24 @@ export function decode(value: Buffer): Data {
 
 // TODO: account for inline commands, support telnet
 function parse(value: Buffer, readIndex = 0): Token {
-  const type = String.fromCharCode(value.readUInt8(readIndex));
+  const prefix = String.fromCharCode(value.readUInt8(readIndex));
   readIndex++;
 
-  switch (type) {
-    case RESPType.SimpleString:
+  switch (prefix) {
+    case Prefix.SimpleString:
       return decodeSimpleString(value, readIndex);
-    case RESPType.BulkString:
+    case Prefix.BulkString:
       return decodeBulkString(value, readIndex);
-    case RESPType.Array:
+    case Prefix.Array:
       return decodeArray(value, readIndex);
-    case RESPType.Integer:
+    case Prefix.Integer:
       return decodeInteger(value, readIndex);
-    case RESPType.Error: {
+    case Prefix.Error: {
       const error = readString(value, readIndex);
       throw new Error(error);
     }
     default:
-      throw new Error(`unknown data type prefix '${type}'`);
+      throw new Error(`unknown data type prefix '${prefix}'`);
   }
 }
 
