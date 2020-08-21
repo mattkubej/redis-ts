@@ -1,8 +1,7 @@
 import RedisCommand from './redis-command';
 import { Socket } from 'net';
-import { NULL, OK } from '../resp/constants';
+import { Data, NULL, OK } from '../resp/constants';
 import { get, set } from '../db';
-import { Data } from '../resp/constants';
 
 export default class Set extends RedisCommand {
   constructor() {
