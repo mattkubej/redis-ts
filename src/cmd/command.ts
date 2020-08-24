@@ -6,15 +6,28 @@ import {
   encodeInteger,
   encodeSimpleString,
 } from '../resp/encoder';
-import { Data } from '../resp/constants';
+import { Data, NULL } from '../resp/constants';
 
 export default class Command extends RedisCommand {
-  // TODO: build map of encodedArrays on command creation
+  private details: Map<string, string>;
+
   constructor(private commands: Map<string, RedisCommand>) {
     super('command', -1, ['loading', 'stale'], 0, 0, 0);
+
+    this.details = this.buildDetails();
   }
 
-  // TODO: can this get cleaned up?
+  private buildDetails(): Map<string, string> {
+    const details = new Map();
+
+    details.set(this.name, this.addCommandReply(this));
+    this.commands.forEach((cmd) => {
+      details.set(cmd.name, this.addCommandReply(cmd));
+    });
+
+    return details;
+  }
+
   execute(client: Socket, request: Data[]): void {
     if (request.length === 1) {
       this.sendAllDetails(client);
@@ -47,28 +60,17 @@ export default class Command extends RedisCommand {
   }
 
   private sendAllDetails(client: Socket) {
-    const allDetails = [this.addCommandReply(this)];
-
-    this.commands.forEach((cmd) => {
-      allDetails.push(this.addCommandReply(cmd));
-    });
-
+    const allDetails = Array.from(this.details.values());
     const reply = encodeArray(allDetails);
     client.write(reply);
   }
 
-  // TODO: clean this up?
   private sendDetails(client: Socket, request: Data[]) {
     const details = [];
 
     for (let i = 2; i < request.length; i++) {
       const cmdName = String(request[i]).toLowerCase();
-      const command = cmdName === this.name ? this : this.commands.get(cmdName);
-
-      const detail = command
-        ? this.addCommandReply(command)
-        : encodeBulkString(null);
-
+      const detail = this.details.get(cmdName) || NULL;
       details.push(detail);
     }
 
