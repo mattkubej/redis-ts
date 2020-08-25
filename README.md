@@ -2,7 +2,7 @@
 
 Limited feature implementation of [Redis](https://redis.io/) in TypeScript.
 
-Communicates with clients utilizing the RESP protocol (i.e. redis-client).
+Communicates with clients utilizing [RESP](https://redis.io/topics/protocol) (i.e. redis-client).
 
 ## Supported Commands
 
