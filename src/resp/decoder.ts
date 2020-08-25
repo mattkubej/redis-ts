@@ -1,14 +1,14 @@
-import { Data, CRLF, Prefix } from './constants';
+import { Data, CR, LF, CRLF, Prefix } from './constants';
 
 type Token = {
-  value: Data;
-  readIndex: number;
+  value: Data; // TODO: consider renaming value
+  offset: number;
 };
 
 export function decode(value: Buffer): Data {
-  const { value: result, readIndex } = parse(value);
+  const { value: result, offset } = parse(value);
 
-  if (readIndex !== value.length) {
+  if (offset !== value.length) {
     throw new Error('read values do not match buffer length');
   }
 
@@ -19,22 +19,20 @@ export function decode(value: Buffer): Data {
   return result;
 }
 
-// TODO: account for inline commands, support telnet
-function parse(value: Buffer, readIndex = 0): Token {
-  const prefix = String.fromCharCode(value.readUInt8(readIndex));
-  readIndex++;
+function parse(value: Buffer, offset = 0): Token {
+  const prefix = String.fromCharCode(value.readUInt8(offset++));
 
   switch (prefix) {
     case Prefix.SimpleString:
-      return decodeSimpleString(value, readIndex);
+      return decodeSimpleString(value, offset);
     case Prefix.BulkString:
-      return decodeBulkString(value, readIndex);
+      return decodeBulkString(value, offset);
     case Prefix.Array:
-      return decodeArray(value, readIndex);
+      return decodeArray(value, offset);
     case Prefix.Integer:
-      return decodeInteger(value, readIndex);
+      return decodeInteger(value, offset);
     case Prefix.Error: {
-      const error = readString(value, readIndex);
+      const error = readNext(value, offset);
       throw new Error(error);
     }
     default:
@@ -42,80 +40,79 @@ function parse(value: Buffer, readIndex = 0): Token {
   }
 }
 
-// TODO: clean up implementation
-function readString(value: Buffer, position = 0): string {
+function readNext(value: Buffer, offset = 0): string {
   let token = '';
-  let readIndex = position;
   let char = '';
 
-  while (char !== '\r') {
+  while (char !== CR) {
     token += char;
-    char = String.fromCharCode(value.readUInt8(readIndex));
-    readIndex++;
+    char = String.fromCharCode(value.readUInt8(offset++));
   }
 
-  const nextByte = String.fromCharCode(value.readUInt8(readIndex));
-  if (nextByte !== '\n') throw new Error('bad');
-  readIndex++;
+  const nextByte = String.fromCharCode(value.readUInt8(offset++));
+  if (nextByte !== LF) {
+    throw new Error('ill-formed token, expected LF');
+  }
 
   return token;
 }
 
-function decodeSimpleString(value: Buffer, readIndex: number): Token {
-  const token = readString(value, readIndex);
+function decodeSimpleString(value: Buffer, offset: number): Token {
+  const token = readNext(value, offset);
 
   return {
     value: token,
-    readIndex: readIndex + token.length + CRLF.length,
+    offset: offset + token.length + CRLF.length,
   };
 }
 
-function decodeBulkString(value: Buffer, readIndex: number): Token {
-  const token = readString(value, readIndex);
+function decodeBulkString(value: Buffer, offset: number): Token {
+  const token = readNext(value, offset);
   const bytes = parseInt(token, 10);
-  readIndex += token.length + CRLF.length;
+  offset += token.length + CRLF.length;
 
   if (bytes === -1) {
     return {
       value: null,
-      readIndex,
+      offset,
     };
   }
 
-  const bulkString = readString(value, readIndex);
-  readIndex += bytes + CRLF.length;
+  // TODO: investigate not matching bytes
+  const bulkString = readNext(value, offset);
+  offset += bytes + CRLF.length;
 
   return {
     value: bulkString,
-    readIndex,
+    offset,
   };
 }
 
-function decodeArray(value: Buffer, readIndex: number): Token {
-  const token = readString(value, readIndex);
+function decodeArray(value: Buffer, offset: number): Token {
+  const token = readNext(value, offset);
   const count = parseInt(token, 10);
-  readIndex += token.length + CRLF.length;
+  offset += token.length + CRLF.length;
 
   const elements = [];
   for (let i = 0; i < count; i++) {
-    const token = parse(value, readIndex);
-    readIndex = token.readIndex;
+    const token = parse(value, offset);
+    offset = token.offset;
     elements.push(token.value);
   }
 
   return {
     value: elements,
-    readIndex,
+    offset,
   };
 }
 
-function decodeInteger(value: Buffer, readIndex: number): Token {
-  const token = readString(value, readIndex);
+function decodeInteger(value: Buffer, offset: number): Token {
+  const token = readNext(value, offset);
   const integer = parseInt(token, 10);
-  readIndex += token.length + CRLF.length;
+  offset += token.length + CRLF.length;
 
   return {
     value: integer,
-    readIndex,
+    offset,
   };
 }
