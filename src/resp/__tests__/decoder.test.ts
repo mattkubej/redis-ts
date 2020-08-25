@@ -44,21 +44,14 @@ describe('decode', () => {
       expect(() => {
         const data = Buffer.from('-BOOM\r\n');
         decode(data);
-      }).toThrowError('BOOM');
+      }).toThrow(new Error('BOOM'));
     });
-  });
-
-  it('should throw an error when read values do not match buffer length', () => {
-    expect(() => {
-      const data = Buffer.from('*$4\r\nAB\r\n');
-      decode(data);
-    }).toThrowError('read values do not match buffer length');
   });
 
   it('should throw an error when receiving an unknown prefix', () => {
     expect(() => {
       const data = Buffer.from('&error\r\n');
       decode(data);
-    }).toThrowError("unknown data type prefix '&'");
+    }).toThrow(new Error("Protocol error: unknown data type prefix '&'"));
   });
 });

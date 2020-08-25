@@ -1,22 +1,14 @@
-import { Data, CR, LF, CRLF, Prefix } from './constants';
+import { Data, CR, LF, Prefix } from './constants';
 
 type Token = {
   value: Data; // TODO: consider renaming value
   offset: number;
 };
 
+// TODO: introduce tests for error handling
 export function decode(value: Buffer): Data {
-  const { value: result, offset } = parse(value);
-
-  if (offset !== value.length) {
-    throw new Error('read values do not match buffer length');
-  }
-
-  if (result instanceof Array) {
-    return result;
-  }
-
-  return result;
+  const token = parse(value);
+  return token.value;
 }
 
 function parse(value: Buffer, offset = 0): Token {
@@ -33,43 +25,50 @@ function parse(value: Buffer, offset = 0): Token {
       return decodeInteger(value, offset);
     case Prefix.Error: {
       const error = readNext(value, offset);
-      throw new Error(error);
+      throw new Error(String(error.value));
     }
     default:
-      throw new Error(`unknown data type prefix '${prefix}'`);
+      throw new Error(`Protocol error: unknown data type prefix '${prefix}'`);
   }
 }
 
-function readNext(value: Buffer, offset = 0): string {
-  let token = '';
+function readNext(value: Buffer, offset = 0): Token {
+  let tokenValue = '';
   let char = '';
 
   while (char !== CR) {
-    token += char;
+    tokenValue += char;
     char = String.fromCharCode(value.readUInt8(offset++));
   }
 
   const nextByte = String.fromCharCode(value.readUInt8(offset++));
   if (nextByte !== LF) {
-    throw new Error('ill-formed token, expected LF');
+    throw new Error('Protocol error: must terminate with CRLF');
   }
 
-  return token;
+  return {
+    value: tokenValue,
+    offset,
+  };
 }
 
 function decodeSimpleString(value: Buffer, offset: number): Token {
   const token = readNext(value, offset);
 
   return {
-    value: token,
-    offset: offset + token.length + CRLF.length,
+    value: token.value,
+    offset: token.offset,
   };
 }
 
 function decodeBulkString(value: Buffer, offset: number): Token {
-  const token = readNext(value, offset);
-  const bytes = parseInt(token, 10);
-  offset += token.length + CRLF.length;
+  const bytesToken = readNext(value, offset);
+  const bytes = parseInt(String(bytesToken.value), 10);
+  offset = bytesToken.offset;
+
+  if (Number.isNaN(bytes)) {
+    throw new Error('Protocol error: invalid bulk length');
+  }
 
   if (bytes === -1) {
     return {
@@ -79,19 +78,22 @@ function decodeBulkString(value: Buffer, offset: number): Token {
   }
 
   // TODO: investigate not matching bytes
-  const bulkString = readNext(value, offset);
-  offset += bytes + CRLF.length;
+  const bulkStringToken = readNext(value, offset);
 
   return {
-    value: bulkString,
-    offset,
+    value: bulkStringToken.value,
+    offset: bulkStringToken.offset,
   };
 }
 
 function decodeArray(value: Buffer, offset: number): Token {
-  const token = readNext(value, offset);
-  const count = parseInt(token, 10);
-  offset += token.length + CRLF.length;
+  const countToken = readNext(value, offset);
+  const count = parseInt(String(countToken.value), 10);
+  offset = countToken.offset;
+
+  if (Number.isNaN(count)) {
+    throw new Error('Protocol error: invalid array length');
+  }
 
   const elements = [];
   for (let i = 0; i < count; i++) {
@@ -108,11 +110,14 @@ function decodeArray(value: Buffer, offset: number): Token {
 
 function decodeInteger(value: Buffer, offset: number): Token {
   const token = readNext(value, offset);
-  const integer = parseInt(token, 10);
-  offset += token.length + CRLF.length;
+  const integer = parseInt(String(token.value), 10);
+
+  if (Number.isNaN(integer)) {
+    throw new Error('Protocol error: invalid integer');
+  }
 
   return {
     value: integer,
-    offset,
+    offset: token.offset,
   };
 }
