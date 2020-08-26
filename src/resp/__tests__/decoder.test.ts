@@ -21,6 +21,13 @@ describe('decode', () => {
       const result = decode(data);
       expect(result).toBeNull();
     });
+
+    it('should throw an error when bulk length is not a number', () => {
+      expect(() => {
+        const data = Buffer.from('$a\r\nBAD\r\n');
+        decode(data);
+      }).toThrow(new Error('Protocol error: invalid bulk length'));
+    });
   });
 
   describe('integer', () => {
