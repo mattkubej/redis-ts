@@ -54,4 +54,25 @@ describe('decode', () => {
       decode(data);
     }).toThrow(new Error("Protocol error: unknown data type prefix '&'"));
   });
+
+  it('should throw an error when not terminating with CRLF', () => {
+    expect(() => {
+      const data = Buffer.from('+bad');
+      decode(data);
+    }).toThrow(new Error('Protocol error: must terminate with CRLF'));
+  });
+
+  it('should throw an error when only terminating with CR', () => {
+    expect(() => {
+      const data = Buffer.from('+bad\r');
+      decode(data);
+    }).toThrow(new Error('Protocol error: must terminate with CRLF'));
+  });
+
+  it('should throw an error when terminating with a value other than LF', () => {
+    expect(() => {
+      const data = Buffer.from('+bad\r\t');
+      decode(data);
+    }).toThrow(new Error('Protocol error: must terminate with CRLF'));
+  });
 });

@@ -36,13 +36,15 @@ function readNext(value: Buffer, offset = 0): Token {
   let tokenValue = '';
   let char = '';
 
-  while (char !== CR) {
+  while (char !== CR && offset < value.length) {
     tokenValue += char;
     char = String.fromCharCode(value.readUInt8(offset++));
   }
 
-  const nextByte = String.fromCharCode(value.readUInt8(offset++));
-  if (nextByte !== LF) {
+  try {
+    const nextByte = String.fromCharCode(value.readUInt8(offset++));
+    if (nextByte !== LF) throw new Error();
+  } catch (e) {
     throw new Error('Protocol error: must terminate with CRLF');
   }
 
