@@ -44,6 +44,13 @@ describe('decode', () => {
       const result = decode(data);
       expect(result).toStrictEqual(['TEST', ['ABCD', 2]]);
     });
+
+    it('should throw an error when array length is not a number', () => {
+      expect(() => {
+        const data = Buffer.from('*a\r\n+BAD\r\n');
+        decode(data);
+      }).toThrow(new Error('Protocol error: invalid array length'));
+    });
   });
 
   describe('error', () => {
