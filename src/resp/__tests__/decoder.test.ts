@@ -36,6 +36,13 @@ describe('decode', () => {
       const result = decode(data);
       expect(result).toBe(2);
     });
+
+    it('should throw an error when decoded value is not an integer', () => {
+      expect(() => {
+        const data = Buffer.from(':a\r\n');
+        decode(data);
+      }).toThrow('Protocol error: invalid integer');
+    });
   });
 
   describe('array', () => {
