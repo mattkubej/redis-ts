@@ -5,7 +5,6 @@ type Token = {
   offset: number;
 };
 
-// TODO: introduce tests for error handling
 export function decode(value: Buffer): Data {
   const token = parse(value);
   return token.value;
