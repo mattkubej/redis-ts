@@ -28,6 +28,15 @@ describe('decode', () => {
         decode(data);
       }).toThrow(new Error('Protocol error: invalid bulk length'));
     });
+
+    it('should throw an error when bulk length does not match value length', () => {
+      expect(() => {
+        const data = Buffer.from('$2\r\nBAD\r\n');
+        decode(data);
+      }).toThrow(
+        new Error('Protocol error: bulk length does not match value length')
+      );
+    });
   });
 
   describe('integer', () => {

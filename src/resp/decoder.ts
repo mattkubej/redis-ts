@@ -79,8 +79,11 @@ function decodeBulkString(value: Buffer, offset: number): Token {
     };
   }
 
-  // TODO: investigate not matching bytes
   const bulkStringToken = readNext(value, offset);
+
+  if (String(bulkStringToken.value).length !== bytes) {
+    throw new Error('Protocol error: bulk length does not match value length');
+  }
 
   return {
     value: bulkStringToken.value,
