@@ -11,4 +11,4 @@ Communicates with clients utilizing [RESP](https://redis.io/topics/protocol) (i.
 * GET
 * PING
 * QUIT
-* SET
+* SET (supports nx and xx)
