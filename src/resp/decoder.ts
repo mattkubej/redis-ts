@@ -1,7 +1,7 @@
 import { Data, CR, LF, Prefix } from './constants';
 
 type Token = {
-  value: Data; // TODO: consider renaming value
+  value: Data;
   offset: number;
 };
 
